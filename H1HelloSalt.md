@@ -258,9 +258,16 @@ Saan huomattavasti enemmän virheilmoituksia mutta sama "päävirhe" kuitenkin;
 
                 Error while creating domain: Error saving the server: Call to virDomainDefineXML failed: invalid argument: could not get preferred machine for /usr/bin/qemu-system-x86_64 type=kvm
                 
-Tässä vaiheessa alkaa taikurin hihat olemaan aika tyhjiä.
+Tässä vaiheessa alkaa taikurin hihat olemaan aika tyhjiä. Oma epäilyss että virtuaalikone ei pysty luomaan omia virtuaalikone. Inception tyylinen ratkaisu ei näköjään toimi.
 
+Seuraava steppi on suorittaa koko tämä asennus suoraan host Windows koneelle.
+Käytän lähteenä Tuomas Valkamo raporttia kyseisestä asennuksesta. Lähde: https://tuomasvalkamo.com/CMS-course/week-6/
 
+Lataan Vagrantin virallisilta sivuilta uusimman Vagrant version Windowsille. https://developer.hashicorp.com/vagrant/downloads
+
+Asensin suoraan C: levylle ohjelman. Asennuksen jälkeen taikuri päätti siirtyä lepäämään ja jatkamanaan orjien hallitsemista myöhemällä ajalla.'
+
+Lopetin työskentelyn 30/3/2023 Kl 21.23
                 
 
 
