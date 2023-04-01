@@ -340,10 +340,43 @@ Tuhoan kaikki aikasemmat tiedostot sekä annan `vagrant destroy` komennon.
 
 Ajan komennon `vagrant init debian/bullseye64` ja saan taas saman virhekoodin kun aikasemmin.
 
-                
+Jälleen kerran käännyn epätoivossa tekoälyn puoleen.
 
-                
+Liitän suoraan koko virheilmoituksen ja saan vastaukseksi seuraavan: 
 
+                It appears that there is an issue with loading a JSON file in Vagrant, resulting in an "ArgumentError" with the message "negative string size (or size too big)". This error can occur when the JSON file being loaded is malformed or corrupted.
+
+                Here are some possible solutions:
+
+                Check the JSON file: Make sure that the JSON file being loaded is valid and well-formed. You can use an online JSON validator to check the file's syntax.
+                ##TÄMÄN SUORITAN
+                Delete the Vagrant machine index: The error message suggests that there might be an issue with the Vagrant machine index. You can try deleting the machine index and running Vagrant again. The machine index is typically located in the following directory: %USERPROFILE%\.vagrant.d\data\machine-index
+
+                Update Vagrant: Make sure you are using the latest version of Vagrant. You can update Vagrant by running the following command: vagrant plugin install vagrant.
+
+                Reinstall Vagrant: If none of the above solutions work, you can try reinstalling Vagrant.
+                
+Poistan väliaikaisia tiedostoja ja kokeilen `Vagrant up` komentoa.
+
+NYT SE TOIMI!!!
+
+![image](https://user-images.githubusercontent.com/122887178/229309108-df73dd14-9fb1-42fa-a348-421d2e50c51b.png)
+
+Sain luotua virtuaalikoneen.
+                
+Otan etäyhteyden koneeseen ja totean että se toimii!!
+
+                PS C:\Users\Fredr\Saltdemo> vagrant ssh
+                Linux bullseye 5.10.0-20-amd64 #1 SMP Debian 5.10.158-2 (2022-12-13) x86_64
+
+                The programs included with the Debian GNU/Linux system are free software;
+                the exact distribution terms for each program are described in the
+                individual files in /usr/share/doc/*/copyright.
+
+                Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
+                permitted by applicable law.
+                vagrant@bullseye:~$ whoami
+                vagrant
 
 
 
