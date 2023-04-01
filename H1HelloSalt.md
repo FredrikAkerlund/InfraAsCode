@@ -276,6 +276,25 @@ Tässä vaiheessa kokeilin monta vaihtoehtoa käyttää windowsilla vagranttia m
 
 Aloitan nollista ja asennan uunituoreen virtuaalikoneen Virtualboxilla. Luon Debian 11 koneen. Lähde: https://github.com/FredrikAkerlund/saitti/blob/main/h1l%C3%A4ksy.md
 
+Toistan vaiheet mitä aikaisemmin tein:
+
+- Asennan vagrant ohjelman `sudo apt install vagrant-libvirt libvirt-daemon-system`
+- Muutan käyttöoikeudet: `sudo usermod --append --groups libvirt $USER`
+- Luon kansion saltdemo
+- annan komennon `vagrant init debian/bullseye64`
+- Annan komennon `vagrant up` ja saan jälleen kerran samat ongelmat mitä alkuperäisessä tilassa oli: 
+
+                Error while creating domain: Error saving the server: Call to virDomainDefineXML failed: invalid argument: could not get preferred machine for /usr/bin/qemu-system-x86_64 type=kvm
+                
+                
+Tässä vaiheessa en oikeasti tiedä mitä tehdä.
+
+
+
+                
+
+
+
 
 
 
