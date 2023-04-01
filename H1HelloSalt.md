@@ -386,9 +386,83 @@ Ja lopuksi tuhoan suurella vaivalla tehdyn virtuaalikoneen :(
         ==> default: Destroying VM and associated drives...
 Pieni kyynel pääsi valumaan.
 
-B) Asenna kolmen koneen verkko
+B&C) Asenna kolmen koneen verkko ja katso hengittääkö orjat
 
 Muokkaan `Vagrantfile` tiedostoa ja kopioin Tero Karvisen tiedoston. Huom. tein pieniä muutoksia siihen
 
+                                # -*- mode: ruby -*-
+                                # vi: set ft=ruby :
+                                # Copyright 2014-2023 Tero Karvinen http://TeroKarvinen.com
 
+                                $minion = <<MINION
+                                sudo apt-get update
+                                sudo apt-get -qy install salt-minion
+                                echo "master: 192.168.12.3">/etc/salt/minion
+                                sudo service salt-minion restart
+                                echo "See also: https://terokarvinen.com/2023/salt-vagrant/"
+                                MINION
+
+                                $master = <<MASTER
+                                sudo apt-get update
+                                sudo apt-get -qy install salt-master
+                                echo "See also: https://terokarvinen.com/2023/salt-vagrant/"
+                                MASTER
+
+                                Vagrant.configure("2") do |config|
+                                        config.vm.box = "debian/bullseye64"
+
+                                        config.vm.define "f001" do |f001|
+                                                f001.vm.provision :shell, inline: $minion
+                                                f001.vm.network "private_network", ip: "192.168.12.100"
+                                                f001.vm.hostname = "f001"
+                                        end
+
+                                        config.vm.define "f002" do |f002|
+                                                f002.vm.provision :shell, inline: $minion
+                                                f002.vm.network "private_network", ip: "192.168.12.102"
+                                                f002.vm.hostname = "f002"
+                                        end
+
+                                        config.vm.define "fmaster", primary: true do |fmaster|
+                                                fmaster.vm.provision :shell, inline: $master
+                                                fmaster.vm.network "private_network", ip: "192.168.12.3"
+                                                fmaster.vm.hostname = "fmaster"
+                                        end
+                                end
+                                
+Nyt alko homma niin sanotusti rockaamaan. Näen Virtualbox ohjelmasta että tietokoneita luodaan:
+
+![image](https://user-images.githubusercontent.com/122887178/229309568-33c90703-ddcd-4957-a327-11c365c73748.png)
+
+Asennuksessa meni noin 5min.
+
+Seuraavaksi otan etäyhteyden master koneeseen, hyväksyn orjien julkiset avaimet ja kokeilen vastaako orjat pingaugseen.
+
+                PS C:\Users\Fredr\Saltdemo> vagrant ssh fmaster
+                Linux fmaster 5.10.0-20-amd64 #1 SMP Debian 5.10.158-2 (2022-12-13) x86_64
+
+                The programs included with the Debian GNU/Linux system are free software;
+                the exact distribution terms for each program are described in the
+                individual files in /usr/share/doc/*/copyright.
+
+                Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
+                permitted by applicable law.
+                Last login: Sat Apr  1 19:06:11 2023 from 10.0.2.2
+                vagrant@fmaster:~$ sudo salt-key -A
+                The following keys are going to be accepted:
+                Unaccepted Keys:
+                f001
+                f002
+                Proceed? [n/Y] y
+                Key for minion f001 accepted.
+                Key for minion f002 accepted.
+                vagrant@fmaster:~$ sudo salt '*' test.ping
+                f002:
+                    True
+                f001:
+                    True
+                    
+Voin totea että loin 3 konetta ja kaikki toimii. Lopetan tältä päivältä. Kello 22:10
+
+D) 
 
