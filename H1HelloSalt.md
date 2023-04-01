@@ -294,6 +294,38 @@ Siirryn takaisin Windowsin äärelle.
 
 Poistan kaikki Vagrant asennukset. Ja asennan sen uudestaan toivoen että tämä muuttaisi jotain! Välissä käyn ulkoiluttamassa koiraa toivoen että raikas ulkoilma parantaisi ajatuksen juoksua. 
 
+Luon jälleen kerran uuden kansion: 
+
+C:\Users\Fredr\Saltdemo
+
+Avaan kansion powershellissä ja annan komennon `vagrant init debian/bullseye64`
+
+Ja sama ongelma kuin aikasemmin: 
+
+                                PS C:\Users\Fredr\Saltdemo> vagrant init debian/bullseye64
+                A `Vagrantfile` has been placed in this directory. You are now
+                ready to `vagrant up` your first virtual environment! Please read
+                the comments in the Vagrantfile as well as documentation on
+                `vagrantup.com` for more information on using Vagrant.
+                Traceback (most recent call last):
+                        16: from C:/HashiCorp/Vagrant/embedded/gems/2.3.4/gems/vagrant-2.3.4/bin/vagrant:251:in `<main>'
+                        15: from C:/HashiCorp/Vagrant/embedded/gems/2.3.4/gems/vagrant-2.3.4/lib/vagrant/environment.rb:799:in `unload'
+                        14: from C:/HashiCorp/Vagrant/embedded/gems/2.3.4/gems/vagrant-2.3.4/lib/vagrant/environment.rb:543:in `hook'
+                        13: from C:/HashiCorp/Vagrant/embedded/gems/2.3.4/gems/vagrant-2.3.4/lib/vagrant/action/runner.rb:46:in `run'
+                        12: from C:/HashiCorp/Vagrant/embedded/gems/2.3.4/gems/vagrant-2.3.4/lib/vagrant/environment.rb:217:in `block in action_runner'
+                        11: from C:/HashiCorp/Vagrant/embedded/gems/2.3.4/gems/vagrant-2.3.4/lib/vagrant/environment.rb:748:in `machine_index'
+                        10: from C:/HashiCorp/Vagrant/embedded/gems/2.3.4/gems/vagrant-2.3.4/lib/vagrant/environment.rb:748:in `new'         9: from C:/HashiCorp/Vagrant/embedded/gems/2.3.4/gems/vagrant-2.3.4/lib/vagrant/machine_index.rb:54:in `initialize'
+                         8: from C:/HashiCorp/Vagrant/embedded/gems/2.3.4/gems/vagrant-2.3.4/lib/vagrant/machine_index.rb:350:in `with_index_lock'
+                         7: from C:/HashiCorp/Vagrant/embedded/gems/2.3.4/gems/vagrant-2.3.4/lib/vagrant/machine_index.rb:350:in `open'
+                         6: from C:/HashiCorp/Vagrant/embedded/gems/2.3.4/gems/vagrant-2.3.4/lib/vagrant/machine_index.rb:352:in `block in with_index_lock'
+                         5: from C:/HashiCorp/Vagrant/embedded/gems/2.3.4/gems/vagrant-2.3.4/lib/vagrant/machine_index.rb:55:in `block in initialize'
+                         4: from C:/HashiCorp/Vagrant/embedded/gems/2.3.4/gems/vagrant-2.3.4/lib/vagrant/machine_index.rb:322:in `unlocked_reload'
+                         3: from C:/HashiCorp/Vagrant/embedded/mingw64/lib/ruby/2.7.0/json/common.rb:335:in `load'
+                         2: from C:/HashiCorp/Vagrant/embedded/mingw64/lib/ruby/2.7.0/json/common.rb:156:in `parse'
+                         1: from C:/HashiCorp/Vagrant/embedded/mingw64/lib/ruby/2.7.0/json/common.rb:156:in `new'
+                C:/HashiCorp/Vagrant/embedded/mingw64/lib/ruby/2.7.0/json/common.rb:156:in `initialize': negative string size (or size too big) (ArgumentError)
+
+
 
 
 
