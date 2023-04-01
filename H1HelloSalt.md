@@ -269,5 +269,13 @@ Asensin suoraan C: levylle ohjelman. Asennuksen jälkeen taikuri päätti siirty
 
 Lopetin työskentelyn 30/3/2023 Kl 21.23
                 
+                
+## Uudestisyntynyt taikuri jatkaa tehtävää 1/4/23 kl 19:00
+
+Tässä vaiheessa kokeilin monta vaihtoehtoa käyttää windowsilla vagranttia mutta onnistumatta. En tallentanut muistiinpanojani joten valitettavasti tieto on menetetty.
+
+Aloitan nollista ja asennan uunituoreen virtuaalikoneen Virtualboxilla. Luon Debian 11 koneen. Lähde: https://github.com/FredrikAkerlund/saitti/blob/main/h1l%C3%A4ksy.md
+
+
 
 
