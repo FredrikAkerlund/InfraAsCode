@@ -328,7 +328,19 @@ Ja sama ongelma kuin aikasemmin:
 
 
 
+Käännyn tekoälyn puoleen ja sain vinkin että päivitä Ruby ohjelmisto. Eihän minulla sitä ole asenettu joten asennan sen.
 
+https://www.ruby-lang.org/en/downloads/
+
+Asennan sen ja tajuan miksi windows on niin huono näihin hommiin!!!
+
+Käynnistän koneen jälleen kerran ja kokeilen nollasta taas.
+
+Tuhoan kaikki aikasemmat tiedostot sekä annan `vagrant destroy` komennon.
+
+Ajan komennon `vagrant init debian/bullseye64` ja saan taas saman virhekoodin kun aikasemmin.
+
+                
 
                 
 
