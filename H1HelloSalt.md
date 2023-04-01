@@ -290,6 +290,13 @@ Toistan vaiheet mitä aikaisemmin tein:
 Tässä vaiheessa en oikeasti tiedä mitä tehdä.
 
 
+Siirryn takaisin Windowsin äärelle.
+
+Poistan kaikki Vagrant asennukset. Ja asennan sen uudestaan toivoen että tämä muuttaisi jotain! Välissä käyn ulkoiluttamassa koiraa toivoen että raikas ulkoilma parantaisi ajatuksen juoksua. 
+
+
+
+
 
                 
 
