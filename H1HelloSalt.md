@@ -377,8 +377,18 @@ Otan etäyhteyden koneeseen ja totean että se toimii!!
                 permitted by applicable law.
                 vagrant@bullseye:~$ whoami
                 vagrant
+                
+Ja lopuksi tuhoan suurella vaivalla tehdyn virtuaalikoneen :(
 
+        PS C:\Users\Fredr\Saltdemo> vagrant destroy
+            default: Are you sure you want to destroy the 'default' VM? [y/N] y
+        ==> default: Forcing shutdown of VM...
+        ==> default: Destroying VM and associated drives...
+Pieni kyynel pääsi valumaan.
 
+B) Asenna kolmen koneen verkko
+
+Muokkaan `Vagrantfile` tiedostoa ja kopioin Tero Karvisen tiedoston. Huom. tein pieniä muutoksia siihen
 
 
 
