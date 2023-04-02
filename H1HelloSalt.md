@@ -10,6 +10,7 @@ Sijainti: Kymenlaakso
 
 Minulla on asenettu Debian 11 virtuaalikone johon on valmiiksi asenettu micro ja apache2 weppipalvelin.
 
+[TLDR](#Yhteenveto)
 
 X) The basics of GIthub repositories
 
@@ -500,7 +501,317 @@ Kokeilen saada hieman tietoa koneista:
                 f001:
                     Minion did not return. [Not connected]
                     
-Sammutan orjat komennolla `vagrant halt` ja käynnistän ne uudestaan `Vagrant up´
+Sammutan orjat komennolla `vagrant halt` ja käynnistän ne uudestaan `Vagrant up`
+Otan etäyhteiden master koneeseen
 
+Ja kokeilen pingaa kaikkia orjia taas:
+
+		vagrant@fmaster:~$ sudo salt '*' cmd.run 'hostname -I'
+		f002:
+		    10.0.2.15 192.168.12.102
+		f001:
+		    Minion did not return. [Not connected]
+
+Tuhoan f001 ja luon sen uudestaan:
+
+		vagrant destroy f001
+		exit
+		PS C:\Users\Fredr\Saltdemo> vagrant destroy f001
+		    f001: Are you sure you want to destroy the 'f001' VM? [y/N] y
+		==> f001: Forcing shutdown of VM...
+		==> f001: Destroying VM and associated drives...
+		PS C:\Users\Fredr\Saltdemo> vagrant up
+		
+
+		
+		vagrant@fmaster:~$ sudo salt '*' cmd.run 'hostname -I'
+		f002:
+		    10.0.2.15 192.168.12.102
+		f001:
+		    Minion did not return. [Not connected]
+		    
+	    	
+Minulla on näköjään f001 avaimet tuplana:
+
+		vagrant@fmaster:~$ sudo salt-key f002
+		Accepted Keys:
+		f001
+		f002
+		Denied Keys:
+		f001
+		Unaccepted Keys:
+		Rejected Keys:
                 
+		
+Poistan f001 avaimet ja hyväksyn ne uudestaan: 
 
+		vagrant@fmaster:~$ sudo salt-key -d f001
+		The following keys are going to be deleted:
+		Accepted Keys:
+		f001
+		Denied Keys:
+		f001
+		Proceed? [N/y] y
+		Key for minion f001 deleted.
+		Key for minion f001 deleted.
+		vagrant@fmaster:~$ sudo salt-key f002
+		Accepted Keys:
+		f002
+		Denied Keys:
+		Unaccepted Keys:
+		Rejected Keys:
+		
+Samalla poistin f002 avaimet. Luon avaimet uudestaan `vagrant up` komenolla ja hyväksyn ne molemmat.
+Ennen kun teen tämän tarkastan että minulla ei ole avaimia hyväksytty
+
+		vagrant@fmaster:~$ sudo salt-key
+		Accepted Keys:
+		Denied Keys:
+		Unaccepted Keys:
+		Rejected Keys:
+Annan host koneelta ` vagrant up` komennon ja hyväksyn uudet avaimet:
+
+Tämä ei kuitenkaan luo uusia avaimia.
+Selvitän miten saan orjat lähettämään julkiset avaimet master koneelle
+
+Totean että helpoin tapa on tuhoa kaikki koneet ja luoda uudet.
+		
+		PS C:\Users\Fredr\Saltdemo> vagrant destroy
+		    fmaster: Are you sure you want to destroy the 'fmaster' VM? [y/N] y
+		==> fmaster: Forcing shutdown of VM...
+		==> fmaster: Destroying VM and associated drives...
+		    f002: Are you sure you want to destroy the 'f002' VM? [y/N] y
+		==> f002: Forcing shutdown of VM...
+		==> f002: Destroying VM and associated drives...
+		    f001: Are you sure you want to destroy the 'f001' VM? [y/N] y
+		==> f001: Forcing shutdown of VM...
+		==> f001: Destroying VM and associated drives...
+		
+		PS C:\Users\Fredr\Saltdemo> vagrant up
+		
+Odotan noin 10 min ja keitän kahvit itselleni.
+
+Kirjaudun `fmaster`koneelle ja hyväksyn uudet avaimet
+
+		vagrant@fmaster:~$ sudo salt-key -A
+		The following keys are going to be accepted:
+		Unaccepted Keys:
+		f001
+		f002
+		Proceed? [n/Y] y
+		Key for minion f001 accepted.
+		Key for minion f002 accepted.
+		vagrant@fmaster:~$
+		
+Noniin tähän jäi siis kysymys. Miten generoin uudet julkiset avaime orjilta herralle?
+
+		vagrant@fmaster:~$ sudo salt '*' grains.item osfinger ipv4
+		f001:
+		    ----------
+		    ipv4:
+			- 10.0.2.15
+			- 127.0.0.1
+			- 192.168.12.100
+		    osfinger:
+			Debian-11
+		f002:
+		    ----------
+		    ipv4:
+			- 10.0.2.15
+			- 127.0.0.1
+			- 192.168.12.102
+		    osfinger:
+			Debian-11
+			
+Seuraavaksi kokeilen idempotenttia ja luon tiedoston nimeltä `testi` jokaiselle orjalle:
+
+		vagrant@fmaster:~$ sudo salt '*' state.single file.managed '/tmp/testi'
+		f002:
+		----------
+			  ID: /tmp/testi
+		    Function: file.managed
+		      Result: True
+		     Comment: Empty file
+		     Started: 07:10:35.458743
+		    Duration: 4.931 ms
+		     Changes:
+			      ----------
+			      new:
+				  file /tmp/testi created
+
+		Summary for f002
+		------------
+		Succeeded: 1 (changed=1)
+		Failed:    0
+		------------
+		Total states run:     1
+		Total run time:   4.931 ms
+		f001:
+		----------
+			  ID: /tmp/testi
+		    Function: file.managed
+		      Result: True
+		     Comment: Empty file
+		     Started: 07:10:35.463000
+		    Duration: 6.997 ms
+		     Changes:
+			      ----------
+			      new:
+				  file /tmp/testi created
+
+		Summary for f001
+		------------
+		Succeeded: 1 (changed=1)
+		Failed:    0
+		------------
+		Total states run:     1
+		Total run time:   6.997 ms
+		
+Asennan apache kaikille orjille käyttäen idempotenttia:
+
+		vagrant@fmaster:~$ sudo salt --state-output=terse '*' state.single pkg.installed apache2
+		f001:
+		  Name: apache2 - Function: pkg.installed - Result: Changed Started: - 07:13:24.224072 Duration: 7470.232 ms
+
+		Summary for f001
+		------------
+		Succeeded: 1 (changed=1)
+		Failed:    0
+		------------
+		Total states run:     1
+		Total run time:   7.470 s
+		f002:
+		  Name: apache2 - Function: pkg.installed - Result: Changed Started: - 07:13:24.236551 Duration: 7878.969 ms
+
+		Summary for f002
+		------------
+		Succeeded: 1 (changed=1)
+		Failed:    0
+		------------
+		Total states run:     1
+		Total run time:   7.879 s
+		vagrant@fmaster:~$
+		
+Käynnistän demonin ja curlaan orjien nettisivut jonka jälkeen sammutan demonit:
+
+		vagrant@fmaster:~$ sudo apt -y install curl
+		vagrant@fmaster:~$ sudo salt '*' state.single service.running apache2
+		
+		vagrant@fmaster:~$ curl -s 192.168.12.102 | grep title
+		    <title>Apache2 Debian Default Page: It works</title>
+		vagrant@fmaster:~$ curl -s 192.168.12.100 | grep title
+		    <title>Apache2 Debian Default Page: It works</title>
+	    	vagrant@fmaster:~$ sudo salt '*' state.single service.dead apache2
+		
+Luon orjille käyttäjän nimeltä `fredrikte01` ja asennan käyttäjälle bashin käyttöön:
+
+		vagrant@fmaster:~$ sudo salt '*' state.single user.present fredrikte01 shell="/bin/bash"
+		
+Tarkastan että tuliko käyttäjät luotua:
+
+		vagrant@fmaster:~$ sudo salt '*' cmd.run 'cat /etc/passwd |grep fredrikte01'
+		f001:
+		    fredrikte01:x:1001:1001::/home/fredrikte01:/bin/bash
+		f002:
+		    fredrikte01:x:1001:1001::/home/fredrikte01:/bin/bash
+		    
+e) Oma infra koodina
+
+Luon uuden kansion jonne luon `init.sls` tiedoston.
+
+		vagrant@fmaster:/srv/salt/hello$ ls                                                                                     
+		init.sls  
+		
+		$ cat /srv/salt/hello/init.sls
+		/tmp/infra-as-code:
+		  file.managed
+
+		$ sudo salt '*' state.apply hello
+		
+Luon toisen tiedoston nimeltä `top.sls` ja kopioin tero karvisen kirjoituksesta seuraavat tiedot:
+
+		$ sudo salt '*' state.apply hello^C
+		$ sudoedit /srv/salt/top.sls
+		$ cat /srv/salt/top.sls
+		base:
+		  '*':
+		    - hello
+		    
+Kokeilen ajaa uutta komentoani. Tajuan nopeasti että olen tehnyt virheitä.
+
+Kansioon `/srv/salt` luon tiedoston nimeltä top.sls
+
+		vagrant@fmaster:/srv/salt$ cat top.sls
+		base:
+		  '*':
+		    - hello
+Kansioon `/srv/salt/hello` luon tiedoston `init.sls`
+
+		vagrant@fmaster:/srv/salt/hello$ cat init.sls
+		hello:
+		  cmd.run:
+		    - name: echo "Hello World"
+		    
+Nyt on syntaxi kohdillaan. Kokeilen ajaa komentoa:
+
+		vagrant@fmaster:/srv/salt/hello$ sudo salt '*' state.apply
+		f001:
+		----------
+			  ID: hello
+		    Function: cmd.run
+			Name: echo "Hello World"
+		      Result: True
+		     Comment: Command "echo "Hello World"" run
+		     Started: 08:11:03.477734
+		    Duration: 6.532 ms
+		     Changes:
+			      ----------
+			      pid:
+				  4509
+			      retcode:
+				  0
+			      stderr:
+			      stdout:
+				  Hello World
+
+		Summary for f001
+		------------
+		Succeeded: 1 (changed=1)
+		Failed:    0
+		------------
+		Total states run:     1
+		Total run time:   6.532 ms
+		f002:
+		----------
+			  ID: hello
+		    Function: cmd.run
+			Name: echo "Hello World"
+		      Result: True
+		     Comment: Command "echo "Hello World"" run
+		     Started: 08:11:03.540675
+		    Duration: 7.388 ms
+		     Changes:
+			      ----------
+			      pid:
+				  4506
+			      retcode:
+				  0
+			      stderr:
+			      stdout:
+				  Hello World
+
+		Summary for f002
+		------------
+		Succeeded: 1 (changed=1)
+		Failed:    0
+		------------
+		Total states run:     1
+		Total run time:   7.388 ms
+		
+### Yhteenveto {#Yhteenveto}:
+
+
+		
+		
+		
+		
