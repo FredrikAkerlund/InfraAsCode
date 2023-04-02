@@ -823,6 +823,7 @@ Ongelmat listattuna:
 	- Vagrant ei toiminut koska minä en ollut asentanut Ruby ohjelmointikieltä.
 		- Asenettua sen törmäsin lisäongelmiin.
 	- Tekoäly osasi neuvoa että minulla oli `Vagrant machine index` tiedosto joka kannattaisi poistaa.
+		- Tämä kansio sisältää virtuaalikoneiden metadataa ja muuta tietoa virtuaalikoneista. Eli minulla oli jäännyt "kummittelemaan" vanhaa metadataa mitä luulin että olin poistanut.
 	- Poistaessa sen homma lähti toimimaan
 - Kun olin asentanut 3 virtuaalikonetta 1 kone ei vastannu pingauksiin.
 	- Sain selville että avaimissa oli ongelmia. Minulla oli 2 avainta samalle koneelle josta toinen oli hylätty.
