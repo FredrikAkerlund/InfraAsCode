@@ -10,7 +10,7 @@ Sijainti: Kymenlaakso
 
 Minulla on asenettu Debian 11 virtuaalikone johon on valmiiksi asenettu micro ja apache2 weppipalvelin.
 
-[TLDR](Yhteenveto)
+TLDR Sivun lopussa.
 
 X) The basics of GIthub repositories
 
@@ -808,7 +808,34 @@ Nyt on syntaxi kohdillaan. Kokeilen ajaa komentoa:
 		Total states run:     1
 		Total run time:   7.388 ms
 		
-### Yhteenveto {#Yhteenveto}:
+### Yhteenveto:
+
+Törmäsin tässä tehtävässä lukuisiin ongelmiin jonka takia tehtävän tekemiseen meni usea tunti (n. 6h).
+Ongelmat listattuna:
+- En saannut asenettua virtualboxia virtuaalikoneelle.
+	- https://linuxiac.com/how-to-install-virtualbox-on-debian-11-bullseye/ Sivulta löysin ohjeet miten se asennetaan.
+- Kaikki riippuvuudet ei ollut asenettu virtuaalikoneelle (libvrt)
+	- https://wiki.debian.org/Vagrant#Installation Löysin ohjeet mistä voin asentaa kaikki riippuvuudet
+	- `sudo apt install vagrant-libvirt libvirt-daemon-system`
+- Virtualisointi ei ollut mahdollista virtuaalikoneella. Inception tyylinen ratkaisu ei toiminut
+	- `            Error while creating domain: Error saving the server: Call to virDomainDefineXML failed: invalid argument: could not get preferred machine for /usr/bin/qemu-system-x86_64 type=kvm`
+- Seuraavaksi siirryin työskentelemään host koneeni puolella.
+	- Vagrant ei toiminut koska minä en ollut asentanut Ruby ohjelmointikieltä.
+	- Tekoäly osasi neuvoa että minulla oli `Vagrant machine index` tiedosto joka kannattaisi poistaa.
+	- Poistaessa sen homma lähti toimimaan
+- Kun olin asentanut 3 virtuaalikonetta 1 kone ei vastannu pingauksiin.
+	- Sain selville että avaimissa oli ongelmia. Minulla oli 2 avainta samalle koneelle josta toinen oli hylätty.
+	- Tuhosin tämän koneen ja asensin uudestaan. Jonka jälkeen hyväksyin sen avaimet taas.
+	- `Accepted Keys:
+	f001
+	f002
+	Denied Keys:
+	f001`
+	- Samassa prosessissa tuhosin kaikki avaimet enkä tiedä miten ne generoidaan uudestaan.
+	- Joten päädyin tuhoamaan kaikki koneet ja asensin ne uudestaan
+- Kun koneet olivat taas toiminassa annoin muutaman komennon orjille ja loin oman `hello world` komennon joka annettiin kaikille orjille ajaessa `salt '*' state.apply` komennon
+
+Tehtävä itsessään ei ollut haastava mutta ongelmat loivat haasteen. Kun sain ne selätettyä homma sujui hyvin.
 
 
 		
