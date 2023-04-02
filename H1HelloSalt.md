@@ -464,5 +464,43 @@ Seuraavaksi otan etäyhteyden master koneeseen, hyväksyn orjien julkiset avaime
                     
 Voin totea että loin 3 konetta ja kaikki toimii. Lopetan tältä päivältä. Kello 22:10
 
-D) 
+D) Esimerkkejä ja orjien komentelua
+
+Aloitan työskentelyn 2/4/23 kl 0930
+
+Käynnistän virtuaalikoneet komennolla `vagrant up`
+
+Seuraavaksi otan yhteyden master koneeseen.
+
+                PS C:\Users\Fredr\Saltdemo> vagrant ssh fmaster
+                Linux fmaster 5.10.0-20-amd64 #1 SMP Debian 5.10.158-2 (2022-12-13) x86_64
+
+                The programs included with the Debian GNU/Linux system are free software;
+                the exact distribution terms for each program are described in the
+                individual files in /usr/share/doc/*/copyright.
+
+                Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
+                permitted by applicable law.
+                Last login: Sat Apr  1 19:07:49 2023 from 10.0.2.2
+                vagrant@fmaster:~$
+
+
+Kokeilen saada hieman tietoa koneista:
+
+                vagrant@fmaster:~$ sudo salt '*' cmd.run 'hostname -I'
+                f002:
+                    10.0.2.15 192.168.12.102
+                f001:
+                    Minion did not return. [Not connected]
+                ERROR: Minions returned with non-zero exit code
+                
+`f001` orjani ei näköjään ole hengissä. Tarkastetaan pingaamalla se
+
+                vagrant@fmaster:~$ sudo salt 'f001' test.ping
+                f001:
+                    Minion did not return. [Not connected]
+                    
+Sammutan orjat komennolla `vagrant halt` ja käynnistän ne uudestaan `Vagrant up´
+
+                
 
