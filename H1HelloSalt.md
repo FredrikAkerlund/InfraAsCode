@@ -10,7 +10,7 @@ Sijainti: Kymenlaakso
 
 Minulla on asenettu Debian 11 virtuaalikone johon on valmiiksi asenettu micro ja apache2 weppipalvelin.
 
-[TLDR](#Yhteenveto)
+[TLDR](Yhteenveto)
 
 X) The basics of GIthub repositories
 
@@ -808,7 +808,7 @@ Nyt on syntaxi kohdillaan. Kokeilen ajaa komentoa:
 		Total states run:     1
 		Total run time:   7.388 ms
 		
-### Yhteenveto {Yhteenveto}:
+### Yhteenveto {#Yhteenveto}:
 
 
 		
