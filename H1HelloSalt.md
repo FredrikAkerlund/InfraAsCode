@@ -1,5 +1,7 @@
 ## Hello salt 
 
+Tässä tehtävässä törmäsin useaan ongelmaan jonka takia raportti on erittäin pitkä. Sivun lopussa löydät yhteenvedon.
+
 Alusta: Lenovo ideapad 5 pro, R7 5000 sarja 16gt ram, 500gt SSD
 
 OS: Windows 11
@@ -9,8 +11,6 @@ Aika: UTC+2 2030 29/03/23
 Sijainti: Kymenlaakso
 
 Minulla on asenettu Debian 11 virtuaalikone johon on valmiiksi asenettu micro ja apache2 weppipalvelin.
-
-TLDR Sivun lopussa.
 
 X) The basics of GIthub repositories
 
@@ -821,6 +821,7 @@ Ongelmat listattuna:
 	- `            Error while creating domain: Error saving the server: Call to virDomainDefineXML failed: invalid argument: could not get preferred machine for /usr/bin/qemu-system-x86_64 type=kvm`
 - Seuraavaksi siirryin työskentelemään host koneeni puolella.
 	- Vagrant ei toiminut koska minä en ollut asentanut Ruby ohjelmointikieltä.
+		- Asenettua sen törmäsin lisäongelmiin.
 	- Tekoäly osasi neuvoa että minulla oli `Vagrant machine index` tiedosto joka kannattaisi poistaa.
 	- Poistaessa sen homma lähti toimimaan
 - Kun olin asentanut 3 virtuaalikonetta 1 kone ei vastannu pingauksiin.
