@@ -605,6 +605,8 @@ Kirjaudun `fmaster`koneelle ja hyväksyn uudet avaimet
 		
 Noniin tähän jäi siis kysymys. Miten generoin uudet julkiset avaime orjilta herralle?
 
+Vastaus: XXXX XXX XXX
+
 		vagrant@fmaster:~$ sudo salt '*' grains.item osfinger ipv4
 		f001:
 		    ----------
