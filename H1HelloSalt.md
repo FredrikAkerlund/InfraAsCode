@@ -12,14 +12,14 @@ Sijainti: Kymenlaakso
 
 Minulla on asenettu Debian 11 virtuaalikone johon on valmiiksi asenettu micro ja apache2 weppipalvelin.
 
-X) The basics of GIthub repositories
+### X) The basics of GIthub repositories
 
 - GitHub on sivusto jossa kehittäjät ja muut voivat luoda keskitetyn versiohallinta tietokannan ja julkaista sen helposti muille nähtäväksi
 - GitHubiin voi luoda "repositories" suomeksi säilytyspaikkoja omille luomuksille. Githubista on helppo jakaa muille sekä muut voivat tarvittaessa korjata ja auttaa alkuperäistä kehittäjää.
 - Github voi luoda paljon erillaisia tiedostotyyppejä. Markdown, HTML sivustoja, Python koodia jne.
 Lähde: https://terokarvinen.com/2023/create-a-web-page-using-github/
 
-X) The basics of Salt Vagrant. How to master the slave master architecture
+### X) The basics of Salt Vagrant. How to master the slave master architecture
 
 - Salt on voimakas ohjelma jolla voidaan hallita useita tietokoneita keskitetysti.
 - Vagrant on ohjelma jolla voidaan luoda uusia virtuaalikoneita eri verkkoihin. Vagrantia voi käyttää jos haluaa jakaa kehitysympäristöjä jotka ovat identtisiä.
@@ -387,7 +387,7 @@ Ja lopuksi tuhoan suurella vaivalla tehdyn virtuaalikoneen :(
         ==> default: Destroying VM and associated drives...
 Pieni kyynel pääsi valumaan.
 
-B&C) Asenna kolmen koneen verkko ja katso hengittääkö orjat
+### B&C) Asenna kolmen koneen verkko ja katso hengittääkö orjat
 
 Muokkaan `Vagrantfile` tiedostoa ja kopioin Tero Karvisen tiedoston. Huom. tein pieniä muutoksia siihen
 
@@ -465,7 +465,7 @@ Seuraavaksi otan etäyhteyden master koneeseen, hyväksyn orjien julkiset avaime
                     
 Voin totea että loin 3 konetta ja kaikki toimii. Lopetan tältä päivältä. Kello 22:10
 
-D) Esimerkkejä ja orjien komentelua
+### D) Esimerkkejä ja orjien komentelua
 
 Aloitan työskentelyn 2/4/23 kl 0930
 
@@ -605,7 +605,11 @@ Kirjaudun `fmaster`koneelle ja hyväksyn uudet avaimet
 		
 Noniin tähän jäi siis kysymys. Miten generoin uudet julkiset avaime orjilta herralle?
 
-Vastaus: XXXX XXX XXX
+Vastaus: 
+
+Tilanne on se että koska poistin f001 koneen `vagrant destroy` komenolla niin master koneen f001 avain jäi silti talteen. Kun uusi kone luotiin, uusi f001 avain oli samalla ID:llä kun jo poistettu kone. Komenolla `sudo salt-key --finger-all` sain näkyviin avaimet jossa voi tarkastaa koko avaimen.
+
+Uusi orja lähettää avainta kokoajan. Tämän voi myös pakottaa käynnistämällä orja uudestaan komenolla `vagrant reload f001` . Käynistämällä koneen master kone vastaanottaa orjan uuden avaimen jonka se sitten voi hyväksyä.
 
 		vagrant@fmaster:~$ sudo salt '*' grains.item osfinger ipv4
 		f001:
@@ -717,7 +721,7 @@ Tarkastan että tuliko käyttäjät luotua:
 		f002:
 		    fredrikte01:x:1001:1001::/home/fredrikte01:/bin/bash
 		    
-e) Oma infra koodina
+### e) Oma infra koodina
 
 Luon uuden kansion jonne luon `init.sls` tiedoston.
 
