@@ -164,7 +164,7 @@ Voin tässä vaiheessa kuitenkin totea että portti 8888 kuuntelee ssh yhteyksi�
 
 kl 18:00
 
-### B) Automatisointi
+### B +C) Automatisointi ja testaus
 
 Aloitan luomalla uuden tilan salt kansiooni.
 
@@ -293,7 +293,244 @@ Luen Tero karvisen artikkelia ja tajua että sshd_config tiedostoa ei löydy `/s
 
 Kopioin sen sinne:
 
+        vagrant@fmaster:/srv/salt/ssh$ sudo cp /etc/ssh/sshd_config /srv/salt/ssh/
+        vagrant@fmaster:/srv/salt/ssh$ ls
+        init.sls  sshd_config
+        
+Teen pieniä muutoksia `init.sls` tiedostoon.
+
+![image](https://user-images.githubusercontent.com/122887178/230635554-aa4e51e0-43b3-4d2a-8a88-5dc80c89a1e9.png)
+
+ja kokeilen ajaan `state.apply ssh` uudestaan.
+
+        vagrant@fmaster:/srv/salt/ssh$ sudo salt 'f001' state.apply ssh
+        f001:
+        ----------
+                  ID: openssh-server
+            Function: pkg.installed
+              Result: True
+             Comment: All specified packages are already installed
+             Started: 19:45:33.876290
+            Duration: 20.296 ms
+             Changes:
+        ----------
+                  ID: /etc/ssh/sshd_config
+            Function: file.manage
+              Result: False
+             Comment: State 'file.manage' was not found in SLS 'ssh'
+                      Reason: 'file.manage' is not available.
+             Changes:
+        ----------
+                  ID: sshd
+            Function: service.running
+              Result: False
+             Comment: One or more requisite failed: ssh./etc/ssh/sshd_config
+             Started: 19:45:34.293963
+            Duration: 0.004 ms
+             Changes:
+
+        Summary for f001
+        ------------
+        Succeeded: 1
+        Failed:    2
+        ------------
+        Total states run:     3
+        Total run time:  20.300 ms
+        ERROR: Minions returned with non-zero exit code
+        vagrant@fmaster:/srv/salt/ssh$
+        
+Noniin sain uuden virhekoodin. Hyvä tässä oli se että ainakin `Open-ssh` ohjelmisto asentui!!
+
+Virhekoodista ilmenee että `file.manage` ei ole käytettävissä. Ei sinäänsä ihme koska se pitäisi olla `file.managed`.
+Korjaan syntaxi virheen ja kokeilen uudestaan:
+
+        
+          ID: /etc/ssh/sshd_config
+    Function: file.managed
+      Result: False
+     Comment: Source file salt://sshd_config not found in saltenv 'base'
+     Started: 19:49:21.880219
+    Duration: 15.311 ms
+     Changes:
+
+Noniin nyt sain taas eri virheen.
     
+![image](https://user-images.githubusercontent.com/122887178/230636499-212cd605-57db-427e-a27f-a56d63ab362a.png)
+
+Teen muutoksia `init.sls` tiedostoon. (huom kommentoin muut tilat pois mitä tällä hetkellä en korjaa)
+![image](https://user-images.githubusercontent.com/122887178/230636576-862483f7-2835-49f3-b794-71824a60935d.png)
+
+Ja taas tajuan missä virhe on. `salt://` vastaa herran tiedostopolkua `/srv/salt/` mutta minullahan on `sshd_config` tiedosto polussa `/srv/salt/ssh/`
+Korjaan tämän.
+
+![image](https://user-images.githubusercontent.com/122887178/230637909-6d8ac18f-31a0-420e-821b-ff910eff5f79.png)
+
+        vagrant@fmaster:/srv/salt/ssh$ sudo salt 'f001' state.apply ssh
+        f001:
+        ----------
+                  ID: /etc/ssh/sshd_config
+            Function: file.managed
+              Result: True
+             Comment: File /etc/ssh/sshd_config updated
+             Started: 20:03:12.632146
+            Duration: 61.444 ms
+             Changes:
+                      ----------
+                      diff:
+                          ---
+                          +++
+                          @@ -13,7 +13,7 @@
+                           Include /etc/ssh/sshd_config.d/*.conf
+
+                           Port 22
+                          -Port 443
+                          +Port 8888
+                           #AddressFamily any
+                           #ListenAddress 0.0.0.0
+                           #ListenAddress ::
+
+        Summary for f001
+        ------------
+        Succeeded: 1 (changed=1)
+        Failed:    0
+        ------------
+        Total states run:     1
+        Total run time:  61.444 ms
+        
+Homma toimii!! Aivan mahtava.
+
+Vielä varmistan että orjien `ssh` demonit tarkastavat muutokset tiedostossa `/etc/ssh/sshd_config` ja tarvittaessa käynnistävät ssh demonin uudestaan.
+
+![image](https://user-images.githubusercontent.com/122887178/230638449-51baf90c-06b8-4d02-a413-296469e6d521.png)
+
+        -----
+          ID: sshd
+    Function: service.running
+      Result: True
+     Comment: The service sshd is already running
+     Started: 20:07:33.556394
+    Duration: 28.294 ms
+     Changes:
+
+    Summary for f001
+    ------------
+    Succeeded: 3
+    Failed:    0
+    ------------
+    Total states run:     3
+    Total run time:  85.024 ms
+    vagrant@fmaster:/srv/salt/ssh$
+    
+Kokeilen seuraavaksi työni tulokset: 
+
+      
+        vagrant@fmaster:/srv/salt/ssh$ ssh -p 8888 vagrant@192.168.12.100
+        ssh: connect to host 192.168.12.100 port 8888: Connection refused
+        
+        ## Portti 8888 ei vastaa
+        
+        vagrant@fmaster:/srv/salt/ssh$ ssh -p 22 vagrant@192.168.12.100
+        The authenticity of host '192.168.12.100 (192.168.12.100)' can't be established.
+        
+        ## Portti 22 vastaa mutta ei salli pääsyä fmasterilta mikä on outoa
+        
+        ECDSA key fingerprint is SHA256:NK6SjqExRGeEX/XZQV0iUZWzVKcr1oukeb9jlOqoecg.
+        Are you sure you want to continue connecting (yes/no/[fingerprint])? y
+        Please type 'yes', 'no' or the fingerprint: yes
+        Warning: Permanently added '192.168.12.100' (ECDSA) to the list of known hosts.
+        vagrant@192.168.12.100: Permission denied (publickey).
+
+Annan f001 orjalle komennon `sudo systemctl restart ssh`
+
+        vagrant@fmaster:/srv/salt/ssh$ sudo salt 'f001' cmd.run 'sudo systemctl restart ssh'
+        f001:
+        vagrant@fmaster:/srv/salt/ssh$ sudo salt 'f001' cmd.run 'sudo systemctl status ssh'
+        f001:
+            * ssh.service - OpenBSD Secure Shell server
+                 Loaded: loaded (/lib/systemd/system/ssh.service; enabled; vendor preset: enabled)
+                 Active: active (running) since Tue 2023-04-04 20:11:37 UTC; 13s ago
+                   Docs: man:sshd(8)
+                         man:sshd_config(5)
+                Process: 2278 ExecStartPre=/usr/sbin/sshd -t (code=exited, status=0/SUCCESS)
+               Main PID: 2279 (sshd)
+                  Tasks: 1 (limit: 525)
+                 Memory: 1.1M
+                    CPU: 13ms
+                 CGroup: /system.slice/ssh.service
+                         `-2279 sshd: /usr/sbin/sshd -D [listener] 0 of 10-100 startups
+
+            Apr 04 20:11:37 f001 systemd[1]: Starting OpenBSD Secure Shell server...
+            Apr 04 20:11:37 f001 sshd[2279]: Server listening on 0.0.0.0 port 8888.
+            Apr 04 20:11:37 f001 sshd[2279]: Server listening on :: port 8888.
+            Apr 04 20:11:37 f001 sshd[2279]: Server listening on 0.0.0.0 port 22.
+            Apr 04 20:11:37 f001 sshd[2279]: Server listening on :: port 22.
+            Apr 04 20:11:37 f001 systemd[1]: Started OpenBSD Secure Shell server.
+
+Käynnistyksen jälkeen `f001` kuuntelee porttia 8888. Testaan vielä.
+
+        vagrant@fmaster:/srv/salt/ssh$ ssh -p 8888 f001@192.168.12.100
+        f001@192.168.12.100: Permission denied (publickey).
+        
+#### Tätä jään ihmettelemään. Miksi pystyn komentamaan sekä ottamaan `vagrant ssh` komenolla host tietokoneeltani yhteyden orjiin mutta en `fmaster` koneella?
+
+Kokeilen antaa salt komennon orjalle että se lähettä SSH julkisen avaimen master koneelle.
+
+        vagrant@fmaster:/srv/salt/ssh$ sudo salt 'f001' cmd.run 'ssh-keygen'
+        f001:
+            Generating public/private rsa key pair.
+            Enter file in which to save the key (/root/.ssh/id_rsa):
+Yritän kopioida master koneen julkisen avaimen orjalleni.
+
+Lopetin yrittämisen tässä vaiheessa.
+
+### D) Apachen koskettelu Saltilla.
+
+Teen uuden tilan master koneellani.
+
+        vagrant@fmaster:/srv/salt$ sudo mkdir apache
+
+        apache  hello  ssh  top.sls
+        vagrant@fmaster:/srv/salt$ cd apache/
+        vagrant@fmaster:/srv/salt/apache$ sudoedit init.sls
+Teen tilan jotta koneeni asentaa apache2 weppipalvelimen.
+
+![image](https://user-images.githubusercontent.com/122887178/230644580-d9780ce2-3674-43db-8386-6e28f4ce24d1.png)
+
+Kokeilen että tila toimii:
+        
+        vagrant@fmaster:/srv/salt/apache$ sudo salt 'f002' cmd.run 'sudo apt-get update'
+        f002:
+            Get:1 https://security.debian.org/debian-security bullseye-security InRelease [48.4 kB]
+            Hit:2 https://deb.debian.org/debian bullseye InRelease
+            Get:3 https://deb.debian.org/debian bullseye-updates InRelease [44.1 kB]
+            Get:4 https://deb.debian.org/debian bullseye-backports InRelease [49.0 kB]
+            Reading package lists...
+            E: Release file for https://security.debian.org/debian-security/dists/bullseye-security/InRelease is not valid yet (invalid for another 1d 13h 5min 19s). Updates for this repository will not be applied.
+            E: Release file for https://deb.debian.org/debian/dists/bullseye-updates/InRelease is not valid yet (invalid for another 2d 17h 15min 18s). Updates for this repository will not be applied.
+            E: Release file for https://deb.debian.org/debian/dists/bullseye-backports/InRelease is not valid yet (invalid for another 2d 17h 15min 18s). Updates for this repository will not be applied.
+            
+Tämä virhe johtuu siitä että järjestelmän kello on väärässä. Kuten aikasemmin totesin tämä selittää repositorien käytön.
+
+Lopetan tältä päivältä 07/04/2023 kl 1943. Hauskoja ongelmia oli tänään ratkottavana. Jatkan vapaaehtoisen tehtävän tekemistä myöhemällä ajalla. Joten jos luet tämän ennen kun se on valmis niin älä ihmettele.
+
+
+
+        
+
+
+
+        
+
+
+     
+        
+
+
+    
+        
+        
+
+
 
 
 
