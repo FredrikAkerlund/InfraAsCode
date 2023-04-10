@@ -636,10 +636,13 @@ Aloitan tekemällä muutokset master koneelle:
 
 APache on asenettu ja vakio sivu löyty. Seuraavaksi teen muutokset apache conf tiedostoon.
 
-<img width="302" alt="image" src="https://user-images.githubusercontent.com/122887178/230849738-6e0208ba-74a2-4ba5-9400-c34864eb92b9.png">
+<img width="279" alt="image" src="https://user-images.githubusercontent.com/122887178/230851538-a706b5e2-dfd3-4176-9b68-e3f66d3f05cc.png">
+
           
-          
-Tämän pitäisi muuttaa kotisivuni sijainnin /home/~/public.sites kansioon.
+Tämän pitäisi muuttaa kotisivuni sijainnin /home/vagrant/public.sites kansioon.
+
+TÄmän pitäisi toimia kaikilla orjilla koska käyttäjät on aina vagrant.
+En tiedä miten tekisin siten että conf tiedosto viittaisi käyttäjään. ~ merkki käyttäjän tilalla ei toiminut.
 
 Otan nämä sivut käyttöön.
 
@@ -671,7 +674,16 @@ Tein uuden kansion käyttäjälle. Loin sinne testisivun. Otin sen confin käytt
         <address>Apache/2.4.56 (Debian) Server at localhost Port 80</address>
         </body></html>
 
+Tein kirjoitusvirheen kansion nimeämisessä korjaan sen: `public.sites` --> `public_sites`
+
+        vagrant@fmaster:/etc/apache2/sites-available$ curl localhost
+        Apache user testsite
         
+Noin nyt apache näyttää käyttäjän hakemistossa olevan `index.html` sivun.
+
+#### Automatisointi
+
+
 
 
 
