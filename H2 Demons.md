@@ -164,7 +164,7 @@ Voin tässä vaiheessa kuitenkin totea että portti 8888 kuuntelee ssh yhteyksi�
 
 kl 18:00
 
-### B +C) Automatisointi ja testaus
+### B) Automatisointi ja testaus
 
 Aloitan luomalla uuden tilan salt kansiooni.
 
@@ -483,6 +483,7 @@ Yritän kopioida master koneen julkisen avaimen orjalleni.
 
 Lopetin yrittämisen tässä vaiheessa.
 
+
 ### D) Apachen koskettelu Saltilla.
 
 Teen uuden tilan master koneellani.
@@ -509,11 +510,166 @@ Kokeilen että tila toimii:
             E: Release file for https://deb.debian.org/debian/dists/bullseye-updates/InRelease is not valid yet (invalid for another 2d 17h 15min 18s). Updates for this repository will not be applied.
             E: Release file for https://deb.debian.org/debian/dists/bullseye-backports/InRelease is not valid yet (invalid for another 2d 17h 15min 18s). Updates for this repository will not be applied.
             
-Tämä virhe johtuu siitä että järjestelmän kello on väärässä. Kuten aikasemmin totesin tämä selittää repositorien käytön.
+Tämä virhe johtuu siitä että järjestelmän kello on väärässä. Kuten aikasemmin totesin tämä selittää ongelmat repositorien käytössä.
 
 Lopetan tältä päivältä 07/04/2023 kl 1943. Hauskoja ongelmia oli tänään ratkottavana. Jatkan vapaaehtoisen tehtävän tekemistä myöhemällä ajalla. Joten jos luet tämän ennen kun se on valmis niin älä ihmettele.
 
+### Kellon ajan korjaaminen
 
+Jatkan työskentelyä 10/4/23 kl 935
+
+Aloitan käynistämällä virtuaaliympäristön `vagrant up`
+
+Otan yhteyden `fmaster` koneeseen ja tarkistan järjestelmien kellonajat.
+
+        vagrant@fmaster:~$ sudo salt '*' cmd.run 'date'
+        f001:
+            Tue Apr  4 21:10:37 UTC 2023
+        f002:
+            Tue Apr  4 21:08:00 UTC 2023
+        vagrant@fmaster:~$
+        
+Nämä ovat taas väärässä. Yritän etsiä netistä ratkaisua tähän.
+
+LÄhde: https://wiki.debian.org/DateTime
+
+Koska en pysty käyttämään repositoreja syötän ensimmäiseksi manuaalisesti kellon jotta voin asentaa `ntp` ohjelman.
+
+        vagrant@fmaster:~$ date --set 2023-10-4
+        date: cannot set date: Operation not permitted
+        Wed Oct  4 00:00:00 UTC 2023
+        vagrant@fmaster:~$ sudo date --set 2023-10-4
+        Wed Oct  4 00:00:00 UTC 2023
+        vagrant@fmaster:~$ sudo date --set 09:43:35
+        Wed Oct  4 09:43:35 UTC 2023
+        
+Tämä kuitenkin aiheutti ongelmia `apt-get` käytössä:
+
+        vagrant@fmaster:~$ sudo apt-get update
+        Err:1 https://deb.debian.org/debian bullseye InRelease
+          Certificate verification failed: The certificate is NOT trusted. The revocation or OCSP data are old and have been superseded. The certificate chain uses expired certificate.  Could not handshake: Error in the certificate verification. [IP: 151.101.246.132 443]
+        Err:2 https://security.debian.org/debian-security bullseye-security InRelease
+          Certificate verification failed: The certificate is NOT trusted. The revocation or OCSP data are old and have been superseded. The certificate chain uses expired certificate.  Could not handshake: Error in the certificate verification. [IP: 151.101.130.132 443]
+        Err:3 https://deb.debian.org/debian bullseye-updates InRelease
+          Certificate verification failed: The certificate is NOT trusted. The revocation or OCSP data are old and have been superseded. The certificate chain uses expired certificate.  Could not handshake: Error in the certificate verification. [IP: 151.101.246.132 443]
+        Err:4 https://deb.debian.org/debian bullseye-backports InRelease
+          Certificate verification failed: The certificate is NOT trusted. The revocation or OCSP data are old and have been superseded. The certificate chain uses expired certificate.  Could not handshake: Error in the certificate verification. [IP: 151.101.246.132 443]
+        Reading package lists... Done
+        W: Failed to fetch https://deb.debian.org/debian/dists/bullseye/InRelease  Certificate verification failed: The certificate is NOT trusted. The revocation or OCSP data are old and have been superseded. The certificate chain uses expired certificate.  Could not handshake: Error in the certificate verification. [IP: 151.101.246.132 443]
+        W: Failed to fetch https://security.debian.org/debian-security/dists/bullseye-security/InRelease  Certificate verification failed: The certificate is NOT trusted. The revocation or OCSP data are old and have been superseded. The certificate chain uses expired certificate.  Could not handshake: Error in the certificate verification. [IP: 151.101.130.132 443]
+        W: Failed to fetch https://deb.debian.org/debian/dists/bullseye-updates/InRelease  Certificate verification failed: The certificate is NOT trusted. The revocation or OCSP data are old and have been superseded. The certificate chain uses expired certificate.  Could not handshake: Error in the certificate verification. [IP: 151.101.246.132 443]
+        W: Failed to fetch https://deb.debian.org/debian/dists/bullseye-backports/InRelease  Certificate verification failed: The certificate is NOT trusted. The revocation or OCSP data are old and have been superseded. The certificate chain uses expired certificate.  Could not handshake: Error in the certificate verification. [IP: 151.101.246.132 443]
+        W: Some index files failed to download. They have been ignored, or old ones used instead.
+        vagrant@fmaster:~$
+        
+Minulla ei ole `ntp` demonia olemassa enkä pysty asentamaan sitä apt-get koska aika ei ole oikein.
+Kokeilen manuaalisesti laittaa kellon uudestaan ja tämän jälkeen asentamaan `ntp` demonin.
+
+        vagrant@fmaster:~$ sudo date -s "2023-04-10 09:55:30"
+        Mon Apr 10 09:55:30 EEST 2023
+        
+        Nyt toimi apt-get
+        vagrant@fmaster:~$ sudo apt-get update
+        vagrant@fmaster:~$ sudo apt-get install ntp
+        
+       vagrant@fmaster:~$ sudo systemctl status ntp
+        ● ntp.service - Network Time Service
+             Loaded: loaded (/lib/systemd/system/ntp.service; enabled; vendor preset: enabled)
+             Active: active (running) since Mon 2023-04-10 09:55:53 EEST; 7s ago
+               Docs: man:ntpd(8)
+            Process: 30201 ExecStart=/usr/lib/ntp/ntp-systemd-wrapper (code=exited, status=0/SUCCESS)
+           Main PID: 30207 (ntpd)
+              Tasks: 2 (limit: 525)
+             Memory: 1.4M
+                CPU: 40ms
+             CGroup: /system.slice/ntp.service
+                     └─30207 /usr/sbin/ntpd -p /var/run/ntpd.pid -g -u 108:114
+                     
+Nyt näyttäisi `ntp` toimivan.
+
+Seuraavaksi korjaan orjien kellot.
+
+        vagrant@fmaster:~$ sudo salt '*' cmd.run 'sudo date -s "2023-04-10 10:00:00"'
+        f001:
+            Mon Apr 10 10:00:00 UTC 2023
+        f002:
+            Mon Apr 10 10:00:00 UTC 2023
+            
+Kokeilen päivittää repot:
+
+        vagrant@fmaster:~$ sudo salt '*' cmd.run 'sudo apt-get update'
+        Ei tullut vikakoodeja.
+        
+Ja viimeiseksi asennan `ntp` demonin ja tarkistan demonien statuksen:
+
+        vagrant@fmaster:~$ sudo salt '*' cmd.run 'sudo apt-get install -y ntp'
+        
+        vagrant@fmaster:~$ sudo salt '*' cmd.run 'sudo systemctl status ntp'
+        Molemmat orjat näyttää state: active
+        
+Noniin nyt homma näyttäisi toimivan.
+
+### D) Apachen koskettelua SALT:lla
+
+Seuraavan tilan tavoite on asentaa orjille apache, Muuttaa vakio oletus sivu ja tehdä apache konfiguraatiot siten että käyttäjän ei tarvitse sudo oikeuksia muuttaakseen apachen sivuja.
+
+Aloitan tekemällä muutokset master koneelle:
+
+        vagrant@fmaster:~$ sudo apt-get install apache2
+        vagrant@fmaster:~$ sudo systemctl status apache2
+        ● apache2.service - The Apache HTTP Server
+             Loaded: loaded (/lib/systemd/system/apache2.service; enabled; vendor preset: enabled)
+             Active: active (running) since Mon 2023-04-10 10:11:40 EEST; 32s ago
+               Docs: https://httpd.apache.org/docs/2.4/
+           Main PID: 31514 (apache2)
+              Tasks: 55 (limit: 525)
+             Memory: 7.1M
+                CPU: 75ms
+             CGroup: /system.slice/apache2.service
+                     ├─31514 /usr/sbin/apache2 -k start
+                     ├─31516 /usr/sbin/apache2 -k start
+                     └─31517 /usr/sbin/apache2 -k start
+
+        Apr 10 10:11:40 fmaster systemd[1]: Starting The Apache HTTP Server...
+        Apr 10 10:11:40 fmaster apachectl[31513]: AH00558: apache2: Could not reliably determine the server's fully qualified d>
+        Apr 10 10:11:40 fmaster systemd[1]: Started The Apache HTTP Server.
+
+APache on asenettu ja vakio sivu löyty. Seuraavaksi teen muutokset apache conf tiedostoon.
+
+<img width="302" alt="image" src="https://user-images.githubusercontent.com/122887178/230849738-6e0208ba-74a2-4ba5-9400-c34864eb92b9.png">
+          
+          
+Tämän pitäisi muuttaa kotisivuni sijainnin /home/~/public.sites kansioon.
+
+Otan nämä sivut käyttöön.
+
+        vagrant@fmaster:~$ pwd
+        /home/vagrant
+        vagrant@fmaster:~$ mkdir public.sites
+        vagrant@fmaster:~$ ls
+        public.sites
+        vagrant@fmaster:~$ micro index.html
+        vagrant@fmaster:~$ ls
+        index.html  public.sites
+
+        vagrant@fmaster:~$ sudo a2ensite frontpage.conf
+        Enabling site frontpage.
+        To activate the new configuration, you need to run:
+          systemctl reload apache2
+        vagrant@fmaster:~$ sudo systemctl restart apache2
+
+Tein uuden kansion käyttäjälle. Loin sinne testisivun. Otin sen confin käyttöön ` sudo a2enmod` komenolla
+ 
+        vagrant@fmaster:~$ curl localhost
+        <!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+        <html><head>
+        <title>403 Forbidden</title>
+        </head><body>
+        <h1>Forbidden</h1>
+        <p>You don't have permission to access this resource.</p>
+        <hr>
+        <address>Apache/2.4.56 (Debian) Server at localhost Port 80</address>
+        </body></html>
 
         
 
