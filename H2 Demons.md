@@ -925,52 +925,153 @@ Eka käsin sitten automatisointi:
         
 Enhän ole luonut perussivua orjan koneelle. Eli tiedosto puuttuu orjien koneelta. Korjaan tämän suoraan init.sls tiedostoon:
 
-    
+<img width="325" alt="image" src="https://user-images.githubusercontent.com/122887178/230862971-0738737f-693c-448b-bddc-2aa3b14fc9e5.png">
 
+Jonka jälkeen kopioin index.html tiedoston `/srv/salt/apache/` kansioon:
 
-
-
-
-
-
+        vagrant@fmaster:/srv/salt/apache$ sudo cp /home/vagrant/public_sites/index.html /srv/salt/apache/
         
+Kokeillaan uudestaan: 
 
+        ----------
+          ID: /home/vagrant/public_sites/
+    Function: file.managed
+        Name: /home/vagrant/public_sites/index.html
+      Result: False
+     Comment: Parent directory not present
+     Started: 08:27:46.309909
+    Duration: 35.207 ms
+     Changes:
+        ----------
 
-     
+`public_sites` hakemistoa ei ole olemassa. Salt ei näköjään luo sitä itse.
+
+<img width="347" alt="image" src="https://user-images.githubusercontent.com/122887178/230864650-ca1afb81-7e48-429e-90f8-ad588d2c7782.png">
+Lähde: https://docs.saltproject.io/en/latest/ref/states/all/salt.states.file.html
+
+Teen muutoksen ja katotaan tapahtuiko muutoksia:
         
+                ID: /home/vagrant/public_sites/
+    Function: file.managed
+        Name: /home/vagrant/public_sites/index.html
+      Result: True
+     Comment: File /home/vagrant/public_sites/index.html updated
+     Started: 08:31:23.353016
+    Duration: 27.521 ms
+     Changes:
+              ----------
+              diff:
+                  New file
+              mode:
+                  0644
+Ja viimeiseksi lopputesti!:
 
-
-    
+        vagrant@fmaster:/srv/salt/apache$ curl 192.168.12.100
+        Apache user testsite
         
+Sitten laitetaan tila `f002` koneelle:
+
+        vagrant@fmaster:/srv/salt/apache$ sudo salt 'f002' state.apply apache
+            f002:
+            ----------
+                      ID: apache2
+                Function: pkg.installed
+                  Result: True
+                 Comment: All specified packages are already installed
+                 Started: 08:33:25.995297
+                Duration: 31.639 ms
+                 Changes:
+            ----------
+                      ID: /etc/apache2/sites-available/
+                Function: file.managed
+                    Name: /etc/apache2/sites-available/frontpage.conf
+                  Result: True
+                 Comment: File /etc/apache2/sites-available/frontpage.conf updated
+                 Started: 08:33:26.033018
+                Duration: 76.031 ms
+                 Changes:
+                          ----------
+                          diff:
+                              New file
+                          mode:
+                              0644
+            ----------
+                      ID: /home/vagrant/public_sites/
+                Function: file.managed
+                    Name: /home/vagrant/public_sites/index.html
+                  Result: True
+                 Comment: File /home/vagrant/public_sites/index.html updated
+                 Started: 08:33:26.109224
+                Duration: 36.815 ms
+                 Changes:
+                          ----------
+                          diff:
+                              New file
+                          mode:
+                              0644
+            ----------
+                      ID: frontpage
+                Function: cmd.run
+                    Name: sudo a2ensite frontpage.conf
+                  Result: True
+                 Comment: Command "sudo a2ensite frontpage.conf" run
+                 Started: 08:33:26.148504
+                Duration: 75.808 ms
+                 Changes:
+                          ----------
+                          pid:
+                              11985
+                          retcode:
+                              0
+                          stderr:
+                          stdout:
+                              Enabling site frontpage.
+                              To activate the new configuration, you need to run:
+                                systemctl reload apache2
+            ----------
+                      ID: apache2.service
+                Function: service.running
+                  Result: True
+                 Comment: Service restarted
+                 Started: 08:33:26.271120
+                Duration: 238.603 ms
+                 Changes:
+                          ----------
+                          apache2.service:
+                              True
+
+            Summary for f002
+            ------------
+            Succeeded: 5 (changed=4)
+            Failed:    0
+            ------------
+            Total states run:     5
+            Total run time: 458.896 ms
+            
+Asennus onnistui. Sitten curlataan: 
+
+        vagrant@fmaster:/srv/salt/apache$ curl 192.168.12.102 |grep title
+          % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                         Dload  Upload   Total   Spent    Left  Speed
+        100 10701  100 10701    0     0  2612k      0 --:--:-- --:--:-- --:--:-- 3483k
+            <title>Apache2 Debian Default Page: It works</title>
+            
+Noniin, Viimeinen muutos init.sls tiedostoon:
+
+<img width="347" alt="image" src="https://user-images.githubusercontent.com/122887178/230865644-1e99dc4e-4025-4630-9962-6e29e8985bc4.png">
+
+Muutoksessa otin pois default apache configuraation. 
+Ja myös suoritin käsin apache uudelleen käynnistyksen:
+
+        vagrant@fmaster:/srv/salt/apache$ sudo salt 'f002' cmd.run 'sudo systemctl restart apache2'
+        f002:
+        vagrant@fmaster:/srv/salt/apache$ curl 192.168.12.102
+        Apache user testsite
         
+Noin nyt on asenettu koneille.!!!
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
-    
+Lopetin tehtävän 1138.
 
     
-    
 
-
-
-
-
-
-
-
-
-
-    
 
