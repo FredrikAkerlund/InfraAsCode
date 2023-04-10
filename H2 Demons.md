@@ -1072,6 +1072,14 @@ Noin nyt on asenettu koneille.!!!
 
 Lopetin tehtävän 1138.
 
+
+### Yhteenveto
+- SSH kanssa oli ongelmia koska avaimet ei ollut oikein. En osannut siirtää niitä oikein virtalisoidulta konetlaa master koneelle.
+- En saannut orjien suorittamaan `sudo systemctl restart ssh` komentoa itsestään, vaan minun piti tehdä se itse käyttämällä `cmd.run` komentoa.
+- Sama ongelma oli kun yritin asentaa orjille apachen ja luoda käyttäjille konfiguraatiot siten ettei he tarvitse `sudo` oikeuksia muokkaakseen nettisivuja.
+- En myöskään tiedä miten teen saltilla määritettyä tiedostoja käyttäjien kotikansioihin. Tämä aiheuttaa ongelmia jos käyttäjien nimet on jotain muuta kuin `vagrant`.
+- Ongelmien kautta tutustuin YAML, salt states ja moneen muuhun asiaan.
+
     
 
 
