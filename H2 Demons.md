@@ -683,6 +683,252 @@ Noin nyt apache näyttää käyttäjän hakemistossa olevan `index.html` sivun.
 
 #### Automatisointi
 
+Aloitan luomalla uuden tilan `/srv/salt/` kansioon.
+
+        vagrant@fmaster:/srv/salt/apache$ ls
+        init.sls
+        
+Muokkaan init.sls tiedostoa.
+
+<img width="277" alt="image" src="https://user-images.githubusercontent.com/122887178/230853185-8dbfdfb7-6f6c-4434-96c7-ef2ab26de0ea.png">
+
+Kopioin juuri muokkaamani `frontpage.conf` tiedoston `/srv/salt/apache` kansioon 
+
+        vagrant@fmaster:/etc/apache2/sites-available$ sudo cp frontpage.conf /srv/salt/apache/
+        
+Kokeilen tässä vaiheessa ajaa komennon orjalleni.
+
+        vagrant@fmaster:/srv/salt/apache$ sudo salt 'f001' state.apply apache
+        
+        vagrant@fmaster:/srv/salt/apache$ sudo salt 'f001' state.apply apache
+        f001:
+        ----------
+                  ID: apache
+            Function: pkg.installed
+              Result: False
+             Comment: Problem encountered installing package(s). Additional info follows:
+
+                      errors:
+                          - Running scope as unit: run-r38808e8da17a48ee99cc75b91e3a1cf0.scope
+                            E: Package 'apache' has no installation candidate
+             Started: 07:45:46.717344
+            Duration: 1985.616 ms
+             Changes:
+        ----------
+                  ID: /etc/apache/sites-available
+            Function: file.manage
+              Result: False
+             Comment: State 'file.manage' was not found in SLS 'apache'
+                      Reason: 'file.manage' is not available.
+             Changes:
+
+        Summary for f001
+        ------------
+        Succeeded: 0
+        Failed:    2
+        ------------
+        Total states run:     2
+        Total run time:   1.986 s
+
+Tässä näen kirjoitusvirheet init.sls tiedostossa. Korjaan nämä
+
+<img width="257" alt="image" src="https://user-images.githubusercontent.com/122887178/230853774-8db29b4c-62aa-4ca9-a084-1f3451cb2372.png">
+
+Kokeilen uudestaan ajaa tilan orjalleni:
+        
+        ----------
+          ID: /etc/apache/sites-available
+    Function: file.managed
+      Result: False
+     Comment: Parent directory not present
+     Started: 07:48:11.600376
+    Duration: 80.015 ms
+     Changes:
+
+- APache asentui mutta frontpage.conf tiedosto ei kopioitunut koska olin unohtanut "" merkit init.sls tiedostssa.
+Korjaan nämä. Myös polku `/etc/apache2/sites-available` oli kirjoitettu väärin. Korjaan tämän.
+
+<img width="277" alt="image" src="https://user-images.githubusercontent.com/122887178/230854672-3227dab0-d1ad-422f-8115-aabe15b92ede.png">
+
+Saan taas virheen: 
+
+    
+    ID: /etc/apache2/sites-available
+    ## Tässä puuttu / polu lopussa
+    Function: file.managed
+      Result: False
+     Comment: Specified target /etc/apache2/sites-available is a directory
+     Started: 07:52:58.365518
+    Duration: 2.329 ms
+     Changes:
+
+Orjany yrittää siis muuttaa tiedostoa `/etc/apache2/sites-available` mutta tämä on kansio. Joten teen muutoksia `init.sls` tiedostoon:
+
+<img width="332" alt="image" src="https://user-images.githubusercontent.com/122887178/230855818-55ca9524-fbcf-4886-9ad2-a318198aa7f6.png">
+
+        vagrant@fmaster:/srv/salt/apache$ sudo salt 'f001' state.apply apache
+        f001:
+        ----------
+                  ID: apache2
+            Function: pkg.installed
+              Result: True
+             Comment: All specified packages are already installed
+             Started: 07:57:42.554409
+            Duration: 25.433 ms
+             Changes:
+        ----------
+                  ID: /etc/apache2/sites-available/
+            Function: file.managed
+                Name: /etc/apache2/sites-available/frontpage.conf
+              Result: True
+             Comment: File /etc/apache2/sites-available/frontpage.conf updated
+             Started: 07:57:42.583012
+            Duration: 37.197 ms
+             Changes:
+                      ----------
+                      diff:
+                          New file
+                      mode:
+                          0644
+
+        Summary for f001
+        ------------
+        Succeeded: 2 (changed=1)
+        Failed:    0
+        ------------
+        Total states run:     2
+        Total run time:  62.630 ms
+
+Nyt se toimi!
+
+Kokeilen mitä `f001` kotisivu näyttää
+
+        vagrant@fmaster:/srv/salt/apache$ curl 192.168.12.100 |grep title
+          % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                         Dload  Upload   Total   Spent    Left  Speed
+        100 10701  100 10701    0     0  3483k      0 --:--:-- --:--:-- --:--:-- 3483k
+            <title>Apache2 Debian Default Page: It works</title>
+Tätä odotinkin. En ole vielä muuttanut orjan kotisivu conffeja.
+
+Lisään sen init.sls tiedostoon
+
+<img width="392" alt="image" src="https://user-images.githubusercontent.com/122887178/230857176-ef1525ad-3097-4633-8be4-545a6c1394c7.png">
+
+Tiedostoon lisäsin komennon `sudo a2enmod frontpage.conf` jotta orja ottaisi käyttöön oikean conf tiedoston. 
+
+Lisäksi tein watch tilan jotta demoni käynnistyy uudestaan kun conf.tiedostoa muutetaan.
+
+Kokeilen uudestaan: 
+
+        ----------
+          ID: frontpage
+    Function: cmd.run
+        Name: sudo a2enmod frontpage.conf
+      Result: False
+     Comment: Command "sudo a2enmod frontpage.conf" run
+     Started: 08:11:22.241663
+    Duration: 53.898 ms
+     Changes:
+              ----------
+              pid:
+                  5691
+              retcode:
+                  1
+              stderr:
+                  ERROR: Module frontpage.conf does not exist!
+              stdout:
+        ----------
+                  ID: apache2.service
+            Function: service.running
+              Result: True
+             Comment: The service apache2.service is already running
+             Started: 08:11:22.297439
+            Duration: 41.038 ms
+             Changes:
+
+Init.sls tiedosto näyttää tältä.
+<img width="354" alt="image" src="https://user-images.githubusercontent.com/122887178/230858319-8a6a8759-2855-45ce-b14f-95b8fd4a11a6.png">
+
+Eli näköjään frontpage.conf tiedostoa ei ole olemassa orja koneella. tarkastan tämän.
+
+
+        vagrant@fmaster:/srv/salt/apache$ sudo salt 'f001' cmd.run 'ls /etc/apache2/sites-available'
+        f001:
+            000-default.conf
+            default-ssl.conf
+            frontpage.conf
+            
+On se olemassa. Miksi en voi ottaa tätä käyttöön? No tietysti koska se pitää olla `sudo a2ensite frontpage.conf` :D
+
+Teen muutokset ja kokeilen:
+
+        ----------
+                  ID: apache2.service
+            Function: service.running
+              Result: True
+             Comment: The service apache2.service is already running
+             Started: 08:16:37.425295
+            Duration: 40.785 ms
+             Changes:
+
+        Summary for f001
+        ------------
+        Succeeded: 4 (changed=1)
+        Failed:    0
+        ------------
+        Total states run:     4
+        Total run time: 163.381 ms
+
+Nyt se toimii. Kokeilen curlaa koneen apache palvelinta:
+
+        vagrant@fmaster:/srv/salt/apache$ curl 192.168.12.100 |grep title
+          % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                         Dload  Upload   Total   Spent    Left  Speed
+            <title>Apache2 Debian Default Page: It works</title>-:--:-- --:--:--     0
+        100 10701  100 10701    0     0  3483k      0 --:--:-- --:--:-- --:--:-- 3483k
+
+Eli apache2 pitää uudelleen käynnistää:
+
+
+         vagrant@fmaster:/srv/salt/apache$ sudo salt 'f001' cmd.run 'sudo systemctl restart apache2'
+        f001:
+        vagrant@fmaster:/srv/salt/apache$ curl 192.168.12.100 |grep title
+          % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                         Dload  Upload   Total   Spent    Left  Speed
+        100 10701  100 10701    0     0  2612k      0 --:--:-- --:--:-- --:--:-- 3483k
+            <title>Apache2 Debian Default Page: It works</title>
+            
+Miksi tämä ei muuttunut? TUtkin asiaa:
+
+        vagrant@fmaster:/srv/salt/apache$ sudo salt 'f001' cmd.run 'ls /etc/apache2/sites-enabled'
+        f001:
+            000-default.conf
+            frontpage.conf
+Ongelma voi johtua että on 2 conffia enabloitu. Otetaan toinen pois päältä
+
+Eka käsin sitten automatisointi:
+
+        vagrant@fmaster:/srv/salt/apache$ sudo salt 'f001' cmd.run 'sudo a2dissite 000-default.conf'
+        f001:
+            Site 000-default disabled.
+            To activate the new configuration, you need to run:
+              systemctl reload apache2
+        vagrant@fmaster:/srv/salt/apache$ sudo salt 'f001' cmd.run 'sudo systemctl restart apache2'
+        f001:
+        
+
+        vagrant@fmaster:/srv/salt/apache$ curl 192.168.12.100 |grep title
+          % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                         Dload  Upload   Total   Spent    Left  Speed
+        100   279  100   279    0     0  93000      0 --:--:-- --:--:-- --:--:-- 93000
+        <title>403 Forbidden</title>
+        
+Enhän ole luonut perussivua orjan koneelle. Eli tiedosto puuttuu orjien koneelta. Korjaan tämän suoraan init.sls tiedostoon:
+
+    
+
+
+
 
 
 
