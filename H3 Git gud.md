@@ -165,5 +165,7 @@ Lokissa näkyy että uusi nimi sekä käyttäjä tulee lokiin vasta näkyviin mu
 
 ### F) Salted räck
 
+Aloitan tekemällä uuden `Salt` tilan. Jotta pääsen vagrant `fmaster` koneelle käytän Host koneeni Windows Powershelliä:
+
 
 
