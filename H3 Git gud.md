@@ -332,6 +332,8 @@ Näinhän se on. Pelkästään rootilla on oikeus tehdä muutoksia kansioon. Kor
          salt/hello2/init.sls | 3 +++
          1 file changed, 3 insertions(+)
          create mode 100644 salt/hello2/init.sls
+         
+ ### TÄSSÄ TEIN SUUREN VIRHEEN. Annoin tiedostoille kaikki oikeudet. Tämä aiheuttaa suuren turvallisuus riskin! Korjasin asian myöhemmin poistamalla koko clonin.
         
 Lisään tiedoston `/srv/salt/` kansioon ja ajan `state.apply`
 
