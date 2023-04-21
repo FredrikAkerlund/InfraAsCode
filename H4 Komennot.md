@@ -117,9 +117,66 @@ Committaan tässä vaiheessa muutokseni repoon ja pullaan ne master koneella.
         3 files changed, 89 insertions(+), 1 deletion(-)
         create mode 100644 Scripts/hellopython.py
         PS C:\Users\Fredr\GIt\InfraAsCode> git push
+Siirryn master koneelle ja pullaan tiedostot:
+
+        vagrant@fmaster:~/InfraAsCode$ git pull
+        remote: Enumerating objects: 13, done.
+        remote: Counting objects: 100% (13/13), done.
+        remote: Compressing objects: 100% (4/4), done.
+        remote: Total 9 (delta 3), reused 9 (delta 3), pack-reused 0
+        Unpacking objects: 100% (9/9), 3.04 KiB | 1.52 MiB/s, done.
+        From github.com:FredrikAkerlund/InfraAsCode
+        0d5e0ab..a5de570  main       -> origin/main
+        Updating 0d5e0ab..a5de570
+        Fast-forward
+        H4 Komennot.md         | 112 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+        Scripts/hello.sh       |   2 +-
+        Scripts/hellopython.py |   2 ++
+        3 files changed, 114 insertions(+), 2 deletions(-)
+        create mode 100644 Scripts/hellopython.py
+
+Kokeilen toimiiko python ohjelma virtuaalikoneella: 
+
+        vagrant@fmaster:~/InfraAsCode/Scripts$ python3 hellopython.py
+        Hello in python
+
+Se toimii sitten teen saman asian minkä tein bash scriptillä:
+Siirrän tiedoston `/usr/local/bin` hakemistoon ja muutan oikeudet siten että kaikilla on R ja X oikeudet
+
+        vagrant@fmaster:~/InfraAsCode/Scripts$ sudo cp hellopython.py /usr/local/bin/hellopython
+        vagrant@fmaster:~/InfraAsCode/Scripts$ ls -l /usr/local/bin/
+        total 12
+        -rwxr-xr-x 1 root root 290 Apr 18 19:54 greetme
+        -rwxr-xr-x 1 root root  39 Apr 21 13:01 hello
+        -rw-r--r-- 1 root root  45 Apr 21 13:12 hellopython
+        vagrant@fmaster:~/InfraAsCode/Scripts$ sudo chmod ugo+rx /usr/local/bin/hellopython
+Kokeilen toimiiko komento kotihakemistossa: 
+
+        vagrant@fmaster:~/InfraAsCode$ hellopython
+        -bash: /usr/local/bin/hellopython: /usr/local/python3: bad interpreter: No such file or directory
+
+Eli minulla on väärä Shebang osoite. Python3 ei siis sijtaitse täällä:
+Tarkastan missä se sijaitsee:
+
+        vagrant@fmaster:~/InfraAsCode$ which python3
+        /usr/bin/python3¨
+
+Muokkaan python ohjelmistoa:
+
+        #!/usr/bin/python3
+        print("Hello in python")
+
+Ja kokeilen uudestaan: 
+
+        vagrant@fmaster:~$ hellopython
+        Hello in python   
+
+Homma rockkaa!!
+
+
+### c) Automatisoi näiden skriptien asennus orjille Saltilla.
 
 
 
-c) Automatisoi näiden skriptien asennus orjille Saltilla.
 d) Asenna jokin yhden binäärin ohjelma Saltilla orjille.
 e) Vapaaehtoinen: moniOSsaaja. kokeile Saltia jollain muulla käyttöjärjestelmällä kuin Linuxilla.
