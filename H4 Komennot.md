@@ -88,12 +88,36 @@ Tiedoston väri muuttui myös. Kopioidessa värit eivät näy.
 
 Kokeilen uudestaan komentoa kotihakemistossa:
 
+        vagrant@fmaster:~$ pwd
+        /home/vagrant
+        vagrant@fmaster:~$ hello
+        Hello sunshine
 
 
 
 
-b) hello.py. Tee oma Python-skripti ja laita se kaikille käyttäjille.
-Aloitan luomalla .py tiedoston `scripts` kansioon:
+### b) hello.py. Tee oma Python-skripti ja laita se kaikille käyttäjille.
+Aloitan luomalla hellopython.py tiedoston `scripts` kansioon host koneella
+
+Alla on kopio tiedostosta
+
+        #!/usr/bin/python3
+        print("Hello in python")
+
+#!/usr/local/python3 sain komenolla `which python` vagrant master koneelta.
+
+Committaan tässä vaiheessa muutokseni repoon ja pullaan ne master koneella.
+
+        PS C:\Users\Fredr\GIt\InfraAsCode> git add .
+        warning: in the working copy of 'Scripts/hello.sh', LF will be replaced by CRLF the next time Git touches it
+        PS C:\Users\Fredr\GIt\InfraAsCode> git commit -
+        error: pathspec '-' did not match any file(s) known to git
+        PS C:\Users\Fredr\GIt\InfraAsCode> git commit
+        [main c7e83c5] Add hellopython script and some changes to the H4.md file
+        3 files changed, 89 insertions(+), 1 deletion(-)
+        create mode 100644 Scripts/hellopython.py
+        PS C:\Users\Fredr\GIt\InfraAsCode> git push
+
 
 
 c) Automatisoi näiden skriptien asennus orjille Saltilla.
