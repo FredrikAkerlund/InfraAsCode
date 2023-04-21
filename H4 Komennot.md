@@ -176,6 +176,41 @@ Homma rockkaa!!
 
 ### c) Automatisoi näiden skriptien asennus orjille Saltilla.
 
+Seuraavaksi automatisoin ohjelmien asennuksen orjille.
+
+Aloitan luomalla hakemistoon `/srv/salt/` hakemistoon uuden hakemiston mihin kerään kaikki scriptit. Nimeän sen `scripts`:
+
+Kansioon lisään reposta pullatut tiedostot: `hello` sekä `hellopython`:
+        
+        vagrant@fmaster:~/InfraAsCode/Scripts$ ls
+        hello.sh  hellopython.py    
+        vagrant@fmaster:~/InfraAsCode/Scripts$ sudo cp hello.sh hellopython.py /srv/salt/scripts/
+
+Poistan myös ohjelmista .py ja .sh päätteet:
+
+        vagrant@fmaster:/srv/salt/scripts$ sudo mv hello.sh hello
+        vagrant@fmaster:/srv/salt/scripts$ sudo mv hellopython.py hellopython
+        vagrant@fmaster:/srv/salt/scripts$ ls
+        greetme  hello  hellopython  init.sls
+        vagrant@fmaster:/srv/salt/scripts$
+
+Näen omalla koneella että hello ja hellopython on eri värillä kuin greetmee. Tämä johtuu että hello ja hellopython tiedostoilla on eri oikeudet: Käyttäjillä ei ole execute oikeuksia. Korjaan tämän
+
+        vagrant@fmaster:/srv/salt/scripts$ sudo chmod ugo+x hello hellopython
+        vagrant@fmaster:/srv/salt/scripts$ ls -l
+        total 16
+        -rwxr-xr-x 1 root root 338 Apr 18 20:22 greetme
+        -rwxr-xr-x 1 root root  37 Apr 21 13:23 hello
+        -rwxr-xr-x 1 root root  45 Apr 21 13:23 hellopython
+        -rw-r--r-- 1 root root 104 Apr 18 20:19 init.sls
+
+En ole varma onko tämä vaadittu. Mutta tein kuitenkin.
+
+Seuraavaksi luon `init.sls` tiedoston: 
+
+       
+
+
 
 
 d) Asenna jokin yhden binäärin ohjelma Saltilla orjille.
