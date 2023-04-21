@@ -417,7 +417,7 @@ Viimeiseksi ajan tilan molemille orjille:
         Total run time: 565.446 ms
 Nyt voin todeta että molemille koneille on asennettu scriptejä sekä micro ohjelma.
 
-Uskomatonta että tässä tehtävässä ei tullut mitään ongelmia vastaan!!
+Uskomatonta että tässä tehtävässä ei tullut mitään suurempi ongelmia vastaan!!
 
 
 
