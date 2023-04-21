@@ -344,5 +344,25 @@ Aloitan löytämällä binääri tiedoston microlle:
 Löydän tar kansion micron viralliselta github reposta:  https://github.com/zyedidia/micro/releases/tag/v2.0.11
 lataan micro-2.0.11-linux64-static.tar.gz tiedoston local koneelle ja lisään sen omaan repoon: 
 
+Seuraavaksi unzippaan sen ja lisään ohjelman `/srv/salt/scripts` hakemistoon
+        
+        vagrant@fmaster:~/InfraAsCode/micro$ ls
+        micro-2.0.11-linux64-static.tar.gz
+        vagrant@fmaster:~/InfraAsCode/micro$ tar -xf micro-2.0.11-linux64-static.tar.gz
+        vagrant@fmaster:~/InfraAsCode/micro$ ls
+        micro-2.0.11  micro-2.0.11-linux64-static.tar.gz
+        vagrant@fmaster:~/InfraAsCode/micro/micro-2.0.11$ ls
+        LICENSE  LICENSE-THIRD-PARTY  README.md  micro  micro.1  micro.desktop  micro.svg
+
+Tiedosto nimeltä micro on binääri tiedosto. Sen lisään /srv/salt/scripts kansioon:
+
+Sitten teen tarvittavat muutokset `init.sls` tiedostoon:
+
+        
+
+
+
+        
+
 
 
