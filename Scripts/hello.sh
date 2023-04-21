@@ -1,2 +1,2 @@
-#!/usr/local/bin
+#!/usr/bin/bash
 echo "Hello sunshine"
