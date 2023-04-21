@@ -358,6 +358,9 @@ Tiedosto nimeltä micro on binääri tiedosto. Sen lisään /srv/salt/scripts ka
 
 Sitten teen tarvittavat muutokset `init.sls` tiedostoon:
 
+![image](https://user-images.githubusercontent.com/122887178/233619830-5010486c-08e4-4f8a-b329-fb69a3917916.png)
+
+
         
 
 
