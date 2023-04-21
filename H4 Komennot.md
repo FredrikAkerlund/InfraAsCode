@@ -361,7 +361,64 @@ Sitten teen tarvittavat muutokset `init.sls` tiedostoon:
 ![image](https://user-images.githubusercontent.com/122887178/233619830-5010486c-08e4-4f8a-b329-fb69a3917916.png)
 
 
-        
+        vagrant@fmaster:/srv/salt/scripts$ sudo salt 'f001' state.apply "scripts"
+        f001:
+            ID: /usr/local/bin/micro
+            Function: file.managed
+            Result: True
+            Comment: File /usr/local/bin/micro updated
+            Started: 22:20:49.966000
+            Duration: 497.727 ms
+            Changes:
+                    ----------
+                    diff:
+                        New file
+                    mode:
+                        0755
+
+        Summary for f001
+        ------------
+        Succeeded: 4 (changed=1)
+        Failed:    0
+        ------------
+        Total states run:     4
+        Total run time: 544.851 ms
+
+Näytti toimivan. Kokeillaan jos micro toimii orjilla: 
+
+        vagrant@fmaster:/srv/salt/scripts$ sudo salt 'f001' cmd.run "which micro"
+        f001:
+            /usr/local/bin/micro
+
+Ainakin tiedosto löytyy. Kokeillaakseni toimiiko ohjelma otan ssh yhteyden `f001` koneelle: 
+
+        vagrant@f001:~$ micro testi
+
+Teen tiedoston microlla ja se toimii.
+
+KUVA TÄHÄN!!
+
+Viimeiseksi ajan tilan molemille orjille: 
+
+        vagrant@fmaster:~$ sudo salt '*' state.apply "scripts"
+                Summary for f001
+        ------------
+        Succeeded: 4
+        Failed:    0
+        ------------
+        Total states run:     4
+        Total run time: 153.614 ms
+        Summary for f002
+        ------------
+        Succeeded: 4 (changed=4)
+        Failed:    0
+        ------------
+        Total states run:     4
+        Total run time: 565.446 ms
+Nyt voin todeta että molemille koneille on asennettu scriptejä sekä micro ohjelma.
+
+Uskomatonta että tässä tehtävässä ei tullut mitään ongelmia vastaan!!
+
 
 
 
