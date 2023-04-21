@@ -208,7 +208,8 @@ En ole varma onko tämä vaadittu. Mutta tein kuitenkin.
 
 Seuraavaksi luon `init.sls` tiedoston: 
 
-       
+![image](https://user-images.githubusercontent.com/122887178/233614848-281b4e71-88ec-4d27-9c94-8cf79f932b8f.png)
+
 
 
 
