@@ -211,8 +211,138 @@ Seuraavaksi luon `init.sls` tiedoston:
 ![image](https://user-images.githubusercontent.com/122887178/233614848-281b4e71-88ec-4d27-9c94-8cf79f932b8f.png)
 
 
+Ja sitten ajetaan: 
+
+        
+        vagrant@fmaster:/srv/salt/scripts$ sudo salt 'f001' state.apply "scripts"
+        f001:
+        ----------
+                ID: /usr/local/bin/greetme
+            Function: file.managed
+            Result: True
+            Comment: File /usr/local/bin/greetme is in the correct state
+            Started: 21:55:17.122359
+            Duration: 28.486 ms
+            Changes:
+        ----------
+                ID: /usr/local/bin/hello
+            Function: file.managed
+            Result: True
+            Comment: File /usr/local/bin/hello updated
+            Started: 21:55:17.151015
+            Duration: 22.337 ms
+            Changes:
+                    ----------
+                    diff:
+                        New file
+                    mode:
+                        0755
+        ----------
+                ID: /usr/local/bin/hellopython
+            Function: file.managed
+            Result: True
+            Comment: File /usr/local/bin/hellopython updated
+            Started: 21:55:17.173431
+            Duration: 20.762 ms
+            Changes:
+                    ----------
+                    diff:
+                        New file
+                    mode:
+                        0755
+
+        Summary for f001
+        ------------
+        Succeeded: 3 (changed=2)
+        Failed:    0
+        ------------
+        Total states run:     3
+        Total run time:  71.585 ms
+        vagrant@fmaster:/srv/salt/scripts$
+
+Ja sitten kokeillaan:
+
+        vagrant@fmaster:/srv/salt/scripts$ sudo salt '*' cmd.run "hello hellopython"
+        f002:
+            /bin/sh: 1: hello: not found
+        f001:
+             Hello sunshine
+
+Bash komento toimi hyvin. Mites sitten python ohjelma:
+
+        vagrant@fmaster:/srv/salt/scripts$ sudo salt '*' cmd.run "hellopython"
+        f001:
+            /bin/sh: 1: hellopython: not found
+        f002:
+            /bin/sh: 1: hellopython: not found
+
+Ei näköjään löydy. Tarkastetaan `f001` `/usr/local/bin` sisältö:
+
+        vagrant@fmaster:/srv/salt/scripts$ sudo salt '*' cmd.run "ls /usr/local/bin"
+        f002:
+        f001:
+            greetme
+            hello
+            hellopython
+
+On se siellä. Mitä ihmettä? Katsotaan myös `hellopython` tiedoston sisältö:
+
+        vagrant@fmaster:/srv/salt/scripts$ sudo salt '*' cmd.run "cat /usr/local/bin/hellopython"
+        f002:
+            cat: /usr/local/bin/hellopython: No such file or directory
+        f001:
+            #!/usr/local/python3
+            print("Hello in python")
+        ERROR: Minions returned with non-zero exit code
+        vagrant@fmaster:/srv/salt/scripts$ sudo salt '*' cmd.run "which python3"
+        f001:
+            /usr/bin/python3
+        f002:
+            /usr/bin/python3
+
+Eli ongelma on siinä että #! notaatio on väärin. Korjaan tämän herrakoneella jotta virhe ei toistu:
+Minulla on väärä python3 lokaatio. Virheellisesti kirjoitin `#!/usr/local/python3` python ohjelmaan. Sen pitäisi olla `#!/usr/bin/python3`. Korjaan tämän ja kokeilen uudestaan `state.apply`
+
+        vagrant@fmaster:/srv/salt/scripts$ sudo salt 'f001' state.apply "scripts"
+        f001:
+
+            
+                ID: /usr/local/bin/hellopython
+            Function: file.managed
+            Result: True
+            Comment: File /usr/local/bin/hellopython updated
+            Started: 22:03:05.795453
+            Duration: 55.237 ms
+            Changes:
+                    ----------
+                    diff:
+                        ---
+                        +++
+                        @@ -1,2 +1,2 @@
+                        -#!/usr/local/python3
+                        -print("Hello in python")+#!/usr/bin/python3
+                        +print("Hello in python")
+
+        Summary for f001
+        ------------
+        Succeeded: 3 (changed=1)
+        Failed:    0
+        ------------
+        Total states run:     3
+        Total run time: 109.927 ms
+Muutokset tapahtui. Kokeillaan `cmd.run`:
+
+        vagrant@fmaster:/srv/salt/scripts$ sudo salt 'f001' cmd.run "hellopython"
+        f001:
+            Hello in python
+Mahtavaa se toimi!!
+
+### d) Asenna jokin yhden binäärin ohjelma Saltilla orjille.
+Asennan micron kaikille orjille: 
+
+Aloitan löytämällä binääri tiedoston microlle: 
+Löydän tar kansion micron viralliselta github reposta:  https://github.com/zyedidia/micro/releases/tag/v2.0.11
+lataan micro-2.0.11-linux64-static.tar.gz tiedoston local koneelle ja lisään sen omaan repoon: 
 
 
 
-d) Asenna jokin yhden binäärin ohjelma Saltilla orjille.
-e) Vapaaehtoinen: moniOSsaaja. kokeile Saltia jollain muulla käyttöjärjestelmällä kuin Linuxilla.
