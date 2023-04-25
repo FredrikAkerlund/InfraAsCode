@@ -422,9 +422,5 @@ Nyt voin todeta että molemille koneille on asennettu scriptejä sekä micro ohj
 Uskomatonta että tässä tehtävässä ei tullut mitään suurempi ongelmia vastaan!!
 
 
-Testi
-
-        
-
-
+ 
 
