@@ -229,6 +229,7 @@ TOimii. Siiten katson että löytyykö tyhjä tiedosto työpöydältä:
 Löytyhän se sieltä. 
 
 Pienen ajatustyön jälkeen totean etten tiedä mikä on windowsilla linuxin `srv://` vastaava polku. Joten tämä vaihe jäi tähän. 
+Ratkaisu: `srv://` = hakemisto missä salt palvelu on asenettu. Minun tapauksessa. `C:\Program Files\Salt Project\Salt\koodit` ja tämä aiheuttaa ongelmia koska kansio on järjestelmävalvojan hallinoima enkä pysty muokkaamaan tiedostojani.
 
 Myös jäi mietityttämään miten voin suorittaa windowsilla `run as adminstrator` salt komentoja. Olisin halunnut lisätä tiedostoja kaikkien käyttäjien työpöydälle mutta salt antoi virhekoodin siinä vaiheessa. Vaikka ajoin powershelliä järjestelmänvalvojana.
 
@@ -236,4 +237,33 @@ Myös jäi mietityttämään miten voin suorittaa windowsilla `run as adminstrat
 ### d) Installed. Asenna Windowsille ohjelma Saltilla. (Voit käyttää eri vaihtoehtoja: kopioida binäärin suoraan sopivaan kansioon, pkg.installed ja choco, pkg.installed ja salt winrepo).
 
 Viimeisen tehtävän aikana olin internet yhteyksien äärellä joten rakennan Herra-orja arkitehtuurin hyödyntämällä windows virtuaalikonetta.
+
+Aloitan asentamalla Windows virtuaalikoneen. OVA tiedoston sain: https://developer.microsoft.com/en-us/windows/downloads/virtual-machines/. Lähde: https://terokarvinen.com/2023/palvelinten-hallinta-2023-kevat/#h5-vaihtoehdot
+
+Tiedosto on melko suuri 22Gt. Puran tiedoston ja asennan sen Virtual boxilla.
+
+Käytän aiemissa tehtävissä luotua `fmaster` debian virtuaalikonetta herra koneena.
+
+Oracle VirtualBoxissa valitsin valikosta `file` "import appliance" ja valitsin .ova tiedoston. 
+
+Import vaihe kesti noin 20min.
+
+Kun tämä vaihe on valmis minulla on virtuaali windows-kone.
+
+SCREENSHOT TÄHÄN
+
+Lataan virtuaalikoneelle salt minion ohjelman. Dokumentaatiosta ja muiden opiskelijoiden raportista luin että salt ohjelma pitää olla samaa versiota mitä herran koneen salt verrsio on. 
+
+Tarkastan `fmaster` koneen salt version:
+
+                vagrant@fmaster:~$ salt --version
+                salt 3002.6
+
+Windows virtuaalikoneelle lataan kyseisen version saltista: 
+
+        
+
+
+
+
 
