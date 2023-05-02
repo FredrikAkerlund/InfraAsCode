@@ -233,5 +233,7 @@ Pienen ajatustyön jälkeen totean etten tiedä mikä on windowsilla linuxin `sr
 Myös jäi mietityttämään miten voin suorittaa windowsilla `run as adminstrator` salt komentoja. Olisin halunnut lisätä tiedostoja kaikkien käyttäjien työpöydälle mutta salt antoi virhekoodin siinä vaiheessa. Vaikka ajoin powershelliä järjestelmänvalvojana.
 
 
-d) Installed. Asenna Windowsille ohjelma Saltilla. (Voit käyttää eri vaihtoehtoja: kopioida binäärin suoraan sopivaan kansioon, pkg.installed ja choco, pkg.installed ja salt winrepo).
-e) Vapaaehtoinen: Kokeile jotain muuta ominaisuutta tai toimintoa Saltilla Windowsissa.
+### d) Installed. Asenna Windowsille ohjelma Saltilla. (Voit käyttää eri vaihtoehtoja: kopioida binäärin suoraan sopivaan kansioon, pkg.installed ja choco, pkg.installed ja salt winrepo).
+
+Viimeisen tehtävän aikana olin internet yhteyksien äärellä joten rakennan Herra-orja arkitehtuurin hyödyntämällä windows virtuaalikonetta.
+
