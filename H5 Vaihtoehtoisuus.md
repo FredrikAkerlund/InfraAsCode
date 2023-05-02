@@ -250,20 +250,178 @@ Import vaihe kesti noin 20min.
 
 Kun tämä vaihe on valmis minulla on virtuaali windows-kone.
 
-SCREENSHOT TÄHÄN
+![image](https://user-images.githubusercontent.com/122887178/235628328-70398b10-f9fd-4c38-8b54-04a1c00402a1.png)
 
-Lataan virtuaalikoneelle salt minion ohjelman. Dokumentaatiosta ja muiden opiskelijoiden raportista luin että salt ohjelma pitää olla samaa versiota mitä herran koneen salt verrsio on. 
+Lataan virtuaalikoneelle salt minion ohjelman. Dokumentaatiosta ja muiden opiskelijoiden raportista luin että salt ohjelma pitää olla samaa versiota mitä herran koneen salt versio on. 
 
 Tarkastan `fmaster` koneen salt version:
 
                 vagrant@fmaster:~$ salt --version
                 salt 3002.6
 
-Windows virtuaalikoneelle lataan kyseisen version saltista: 
+Windows virtuaalikoneelle lataan kyseisen version saltista. Lähde: (https://archive.repo.saltproject.io/windows/Salt-Minion-3002.6-1-Py3-AMD64.msi)
+
+
+
+![image](https://user-images.githubusercontent.com/122887178/235643479-fe4144fb-e22a-4da8-8096-2f57733c1fae.png)
+
+Seuraavassa vaiheessa tarkistan herra koneen ip osoitteen: 
+
+                3: eth1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP group default qlen 1000
+                    link/ether 08:00:27:bc:34:16 brd ff:ff:ff:ff:ff:ff
+                    altname enp0s8
+                    inet 192.168.12.3/24 brd 192.168.12.255 scope global eth1
+                       valid_lft forever preferred_lft forever
+                    inet6 fe80::a00:27ff:febc:3416/64 scope link
+                       valid_lft forever preferred_lft forever
+![image](https://user-images.githubusercontent.com/122887178/235632901-31b7d55f-f106-46c9-ace5-45d40590ae81.png)
+
+Ja lisään sen salt ohjelman konfiguraatioon.
+
+Tarkastan myös windows virtuaalikoneen verkkoasetukset: 
+
+![image](https://user-images.githubusercontent.com/122887178/235640145-2d6a9223-49e9-4edd-9d3f-db67321e86c3.png)
+
+Käynnistän koneen uudestaan ja tarkastan IP osoitteen:
+
+![image](https://user-images.githubusercontent.com/122887178/235641052-9f403bd9-7a47-4e0c-9a3d-ae433209c2ef.png)
+
+Nyt virtuaalikoneeni on samassa verkossa kuin herra koneeni.
+        
+
+Asennuksen jälkeen tarkastan että orja on kutsunut herraansa:
+
+             vagrant@fmaster:~$ sudo salt-key
+                Accepted Keys:
+                f001
+                f002
+                Denied Keys:
+                Unaccepted Keys:
+                windowslave
+                Rejected Keys:   
+                
+Onhan se. Hyväksyn avaimet:
+
+                vagrant@fmaster:~$ sudo salt-key -A
+                The following keys are going to be accepted:
+                Unaccepted Keys:
+                windowslave
+                Proceed? [n/Y] y
+                Key for minion windowslave accepted.
+                
+Testaan että orja windowsini toimii!
+
+
+                vagrant@fmaster:~/InfraAsCode$ sudo salt 'windowslave' test.ping
+                windowslave:
+                    True
+Huomiona että windows kone on huomattavasti hitaampi kun Linux kone.
+
+Seuraavaksi luon uuden idempotenssitilan windowskoneelle: 
+
+Alla on kuva `init.sls` tiedostosta:
+
+![image](https://user-images.githubusercontent.com/122887178/235645189-a6cd37c1-88b5-42d9-aef6-a52d373b1337.png)
+
+Kokeilen ajaa tilaa orjalleni:
+
+                vagrant@fmaster:/srv/salt/saltforwindows$ sudo salt 'windowslave' state.apply 'saltforwindows'
+                windowslave:
+                ----------
+                          ID: C:\Users\public\desktop\winkkaritrutussa.txt
+                    Function: file.managed
+                      Result: True
+                     Comment: File C:\Users\public\desktop\winkkaritrutussa.txt updated
+                     Started: 03:40:54.422727
+                    Duration: 192.906 ms
+                     Changes:
+                              ----------
+                              diff:
+                                  New file
+
+                Summary for windowslave
+                ------------
+                Succeeded: 1 (changed=1)
+                Failed:    0
+                ------------
+                Total states run:     1
+                Total run time: 192.906 ms
 
         
 
+Tarkastan orjani työpöydältä ilmestyikö tiedosto sinne:
+
+![image](https://user-images.githubusercontent.com/122887178/235646142-48add6b3-31f0-4cb2-ba98-29b841dad92a.png)
 
 
+Ja viimeisenä tarkastan että idempotenssi toimii:
+
+                vagrant@fmaster:/srv/salt/saltforwindows$ sudo salt 'windowslave' state.apply 'saltforwindows'
+                windowslave:
+                ----------
+                          ID: C:\Users\public\desktop\winkkaritrutussa.txt
+                    Function: file.managed
+                      Result: True
+                     Comment: File C:\Users\public\desktop\winkkaritrutussa.txt is in the correct state
+                     Started: 03:45:35.620219
+                    Duration: 132.779 ms
+                     Changes:
+
+                Summary for windowslave
+                ------------
+                Succeeded: 1
+                Failed:    0
+                ------------
+                Total states run:     1
+                Total run time: 132.779 ms
+                
+Viimeisenä temppuna asennan micron windows koneelle `system32` kansioon:
+
+Siirrän micron binääritiedoston `saltforwindows` tilaan.
+
+Ja muokkaan init.sls tiedostoa:
+
+![image](https://user-images.githubusercontent.com/122887178/235647269-bbc9b370-f1c1-4e27-9ee7-254b3381f2f5.png)
+
+Ja kokeilen ajaa tilan orjalleni(tässä kesti jo hieman pidempään):
+
+          windowslave:
+                ----------
+                          ID: C:\Users\public\desktop\winkkaritrutussa.txt
+                    Function: file.managed
+                      Result: True
+                     Comment: File C:\Users\public\desktop\winkkaritrutussa.txt is in the correct state
+                     Started: 03:52:40.212584
+                    Duration: 115.171 ms
+                     Changes:
+                ----------
+                          ID: C:\Windows\system32\micro.exe
+                    Function: file.managed
+                      Result: True
+                     Comment: File C:\Windows\system32\micro.exe updated
+                     Started: 03:52:40.327755
+                    Duration: 1416.785 ms
+                     Changes:
+                              ----------
+                              diff:
+                                  New file
+
+                Summary for windowslave
+                ------------
+                Succeeded: 2 (changed=1)
+                Failed:    0
+                ------------
+                Total states run:     2
+                Total run time:   1.532 s      
+                
+Se näyttää toimivan. Katson vielä virtuaalikoneen työpöydältä löytyykl Micro asenettuna:
+
+![image](https://user-images.githubusercontent.com/122887178/235647725-4642307b-65aa-46c3-a04c-6279cf9308e6.png)
+
+Siellähän se on!!
+
+### Yhteenveto:
+
+Tein tehtävän hieman eri tavalla mitä piti internetin saatavuuden takia. Kuitenkin suurempia ongelmia ei esiintynyt.
 
 
