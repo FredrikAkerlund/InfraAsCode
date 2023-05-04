@@ -414,11 +414,13 @@ Ja kokeilen ajaa tilan orjalleni(tässä kesti jo hieman pidempään):
                 Total states run:     2
                 Total run time:   1.532 s      
                 
-Se näyttää toimivan. Katson vielä virtuaalikoneen työpöydältä löytyykl Micro asenettuna:
+Se näyttää toimivan. Katson vielä virtuaalikoneen työpöydältä löytyykö Micro asenettuna:
 
 ![image](https://user-images.githubusercontent.com/122887178/235647725-4642307b-65aa-46c3-a04c-6279cf9308e6.png)
 
 Siellähän se on!!
+
+UPDATE: Myöhemmin tajusin että kopoioin Linux version Micron binääritiedostosta. Joten Micro ei koskaan toiminut. Lopputestaus jäi siis tekemättä
 
 ### Yhteenveto:
 
